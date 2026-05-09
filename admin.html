@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برجر بينج | لوحة الإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background: #f5f0e8; }
+        .login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .login-card {
+            background: white; max-width: 400px; width: 90%; padding: 2rem; border-radius: 40px;
+            text-align: center; box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+        }
+        .login-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 60px; border: 1px solid #ddd; }
+        .login-card button { background: #e67e22; color: white; border: none; padding: 12px; width: 100%; border-radius: 60px; font-weight: bold; cursor: pointer; }
+        .admin-container { display: none; padding: 20px; }
+        .admin-header { background: #1f1f1f; color: #ffb347; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-radius: 30px; margin-bottom: 30px; }
+        .logout-btn, .back-menu { background: #e67e22; border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; margin: 5px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 30px; }
+        .card { background: white; border-radius: 35px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .card h3 { border-right: 8px solid #e67e22; padding-right: 15px; margin-bottom: 20px; }
+        .item-list { max-height: 320px; overflow-y: auto; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; background: #fef3e4; margin: 8px 0; padding: 8px 12px; border-radius: 60px; }
+        .small-btn { background: #e67e22; border: none; padding: 6px 12px; border-radius: 40px; color: white; margin: 0 3px; cursor: pointer; }
+        .btn-del { background: #c0392b; }
+        .btn-edit { background: #2c6e2f; }
+        .form-group { margin: 15px 0; }
+        input, select, textarea { width: 100%; padding: 10px; border-radius: 60px; border: 1px solid #ccc; margin-top: 8px; }
+        .primary-btn { background: #e67e22; color: white; padding: 10px 20px; border: none; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .sub-card { background: #fff6e8; margin-top: 20px; padding: 15px; border-radius: 28px; }
+        hr { margin: 20px 0; }
+    </style>
+</head>
+<body>
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <h2><i class="fas fa-utensils"></i> برجر بينج | المدير</h2>
+        <input type="text" id="adminUsername" placeholder="اسم المستخدم" value="admin">
+        <input type="password" id="adminPassword" placeholder="كلمة المرور">
+        <button id="doLoginBtn">دخول <i class="fas fa-arrow-left"></i></button>
+        <div id="loginError" class="error-msg" style="color:red;"></div>
+    </div>
+</div>
+
+<div id="adminPanel" class="admin-container">
+    <div class="admin-header">
+        <div><h2><i class="fas fa-crown"></i> لوحة إدارة برجر بينج</h2><span id="currentAdminName">admin</span></div>
+        <div>
+            <a href="index.html" target="_blank" class="back-menu" style="background:#444; text-decoration:none;">معاينة المنيو</a>
+            <button id="logoutMainBtn" class="logout-btn">خروج</button>
+        </div>
+    </div>
+    <div class="dashboard">
+        <div class="card">
+            <h3><i class="fas fa-tags"></i> الأقسام</h3>
+            <div id="categoriesList" class="item-list"></div>
+            <div class="sub-card">
+                <h4>➕ إضافة قسم</h4>
+                <input type="text" id="newCatNameAr" placeholder="الاسم بالعربية">
+                <input type="text" id="newCatNameEn" placeholder="Name in English">
+                <button id="addCategoryBtn" class="primary-btn">إضافة قسم</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-hamburger"></i> المنتجات</h3>
+            <div class="form-group">
+                <select id="productCatFilter"></select>
+                <button id="addProductBtn" class="small-btn" style="background:#2c6e2f;">➕ منتج جديد</button>
+            </div>
+            <div id="productsList" class="item-list"></div>
+            <div id="productModal" style="display:none; background:#fef2e0; border-radius: 30px; padding: 15px; margin-top: 15px;">
+                <h4 id="productFormTitle">إضافة منتج</h4>
+                <input type="hidden" id="editProductId">
+                <input type="text" id="prodNameAr" placeholder="الاسم بالعربية">
+                <input type="text" id="prodNameEn" placeholder="Name in English">
+                <select id="prodCategoryId"></select>
+                <input type="number" id="prodPrice" placeholder="السعر">
+                <input type="number" id="prodOfferPrice" placeholder="سعر العرض (اختياري)">
+                <input type="text" id="prodImage" placeholder="رابط الصورة">
+                <textarea id="prodDescAr" placeholder="وصف بالعربية"></textarea>
+                <textarea id="prodDescEn" placeholder="Description in English"></textarea>
+                <label><input type="checkbox" id="prodIsOffer"> عرض خاص</label>
+                <div><button id="saveProductBtn" class="small-btn">💾 حفظ</button><button id="cancelProductBtn" class="small-btn" style="background:#777;">إلغاء</button></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-ticket-alt"></i> كوبونات الخصم</h3>
+            <div id="couponsList" class="item-list"></div>
+            <div class="sub-card">
+                <input type="text" id="newCouponCode" placeholder="كود الخصم (مثل BING30)">
+                <input type="number" id="newCouponDisc" placeholder="نسبة الخصم %">
+                <button id="addCouponBtn" class="primary-btn">إضافة كوبون</button>
+            </div>
+            <hr>
+            <h3><i class="fas fa-users-cog"></i> إدارة الأدمن</h3>
+            <div id="adminsList" class="item-list"></div>
+            <div class="sub-card">
+                <h4>➕ إضافة أدمن</h4>
+                <input type="text" id="newAdminUser" placeholder="اسم المستخدم">
+                <input type="password" id="newAdminPass" placeholder="كلمة المرور">
+                <button id="addAdminBtn" class="primary-btn">إضافة أدمن</button>
+                <button id="changeOwnPassBtn" class="primary-btn" style="background:#e67e22;">🔐 تغيير كلمة مروري</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_MENU = 'burger_menu_data';
+    const STORAGE_COUPONS = 'burger_coupons';
+    const STORAGE_ADMINS = 'burger_admins';
+    let menuData = { categories: [], products: [] };
+    let couponsList = [];
+    let adminsList = [];
+    let currentLoggedAdmin = null;
+
+    function loadAllData() {
+        let storedMenu = localStorage.getItem(STORAGE_MENU);
+        if(storedMenu) menuData = JSON.parse(storedMenu);
+        else {
+            menuData = {
+                categories: [{ id: "cat1", name_ar: "🍔 برجر كلاسيك", name_en: "Classic Burgers", order: 1 }, { id: "cat2", name_ar: "🍟 أطباق جانبية", name_en: "Sides", order: 2 }],
+                products: [{ id: "p1", catId: "cat1", name_ar: "برجر دبل تشيز", name_en: "Double Cheeseburger", price: 45, offerPrice: 35, image: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=300&h=200&fit=crop", description_ar: "لحم أنجوس", description_en: "Angus beef", isOffer: true }]
+            };
+            saveMenuData();
+        }
+        let storedCoupons = localStorage.getItem(STORAGE_COUPONS);
+        if(storedCoupons) couponsList = JSON.parse(storedCoupons);
+        else couponsList = [{ code: "WELCOME10", discount: 10, type: "percent" }, { code: "BING20", discount: 20, type: "percent" }];
+        let storedAdmins = localStorage.getItem(STORAGE_ADMINS);
+        if(storedAdmins) adminsList = JSON.parse(storedAdmins);
+        else adminsList = [{ username: "admin", password: "200300" }];
+    }
+    function saveMenuData() { localStorage.setItem(STORAGE_MENU, JSON.stringify(menuData)); }
+    function saveCoupons() { localStorage.setItem(STORAGE_COUPONS, JSON.stringify(couponsList)); }
+    function saveAdmins() { localStorage.setItem(STORAGE_ADMINS, JSON.stringify(adminsList)); }
+
+    function renderCategoriesList() {
+        const container = document.getElementById('categoriesList');
+        container.innerHTML = '';
+        menuData.categories.forEach(cat => {
+            let div = document.createElement('div'); div.className = 'item-row';
+            div.innerHTML = `<span><strong>${cat.name_ar} | ${cat.name_en}</strong></span>
+                <div><button class="small-btn btn-edit" data-id="${cat.id}">✏️</button><button class="small-btn btn-del" data-id="${cat.id}">🗑️</button></div>`;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('[data-id].btn-del').forEach(btn => btn.onclick = () => { if(confirm('سيتم حذف القسم وجميع منتجاته')) { menuData.categories = menuData.categories.filter(c=>c.id!==btn.dataset.id); menuData.products = menuData.products.filter(p=>p.catId!==btn.dataset.id); saveMenuData(); renderCategoriesList(); renderProductsList(); populateFilters(); } });
+        document.querySelectorAll('[data-id].btn-edit').forEach(btn => btn.onclick = () => { let cat = menuData.categories.find(c=>c.id===btn.dataset.id); let newAr = prompt("اسم عربي", cat.name_ar); let newEn = prompt("اسم إنجليزي", cat.name_en); if(newAr) cat.name_ar=newAr; if(newEn) cat.name_en=newEn; saveMenuData(); renderCategoriesList(); renderProductsList(); populateFilters(); });
+    }
+    function populateFilters() {
+        let filter = document.getElementById('productCatFilter'); if(filter){ filter.innerHTML='<option value="ALL">كل الأقسام</option>'; menuData.categories.forEach(c=>filter.innerHTML+=`<option value="${c.id}">${c.name_ar}</option>`); filter.onchange=()=>renderProductsList(); }
+        let selectCat = document.getElementById('prodCategoryId'); if(selectCat){ selectCat.innerHTML=''; menuData.categories.forEach(c=>selectCat.innerHTML+=`<option value="${c.id}">${c.name_ar}</option>`); }
+    }
+    function renderProductsList() {
+        let container = document.getElementById('productsList'); if(!container) return;
+        let filter = document.getElementById('productCatFilter')?.value || 'ALL';
+        let filtered = filter==='ALL' ? menuData.products : menuData.products.filter(p=>p.catId===filter);
+        container.innerHTML = '';
+        filtered.forEach(prod => {
+            let div = document.createElement('div'); div.className = 'item-row';
+            div.innerHTML = `<div><strong>${prod.name_ar}</strong> (${prod.price} ₯)</div><div><button class="small-btn btn-edit" data-prod='${JSON.stringify(prod)}'>✏️</button><button class="small-btn btn-del" data-id="${prod.id}">🗑️</button></div>`;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('[data-id].btn-del').forEach(btn => btn.onclick = () => { menuData.products = menuData.products.filter(p=>p.id!==btn.dataset.id); saveMenuData(); renderProductsList(); });
+        document.querySelectorAll('[data-prod].btn-edit').forEach(btn => btn.onclick = () => openProductModal(JSON.parse(btn.dataset.prod)));
+    }
+    function openProductModal(prod=null) {
+        let modal = document.getElementById('productModal');
+        document.getElementById('editProductId').value = prod ? prod.id : '';
+        document.getElementById('prodNameAr').value = prod ? prod.name_ar : '';
+        document.getElementById('prodNameEn').value = prod ? prod.name_en : '';
+        document.getElementById('prodCategoryId').value = prod ? prod.catId : (menuData.categories[0]?.id || '');
+        document.getElementById('prodPrice').value = prod ? prod.price : '';
+        document.getElementById('prodOfferPrice').value = prod?.offerPrice || '';
+        document.getElementById('prodImage').value = prod?.image || '';
+        document.getElementById('prodDescAr').value = prod?.description_ar || '';
+        document.getElementById('prodDescEn').value = prod?.description_en || '';
+        document.getElementById('prodIsOffer').checked = prod?.isOffer || false;
+        document.getElementById('productFormTitle').innerText = prod ? 'تعديل منتج' : 'إضافة منتج';
+        modal.style.display = 'block';
+    }
+    function saveProduct() {
+        let id = document.getElementById('editProductId').value;
+        let name_ar = document.getElementById('prodNameAr').value.trim();
+        let name_en = document.getElementById('prodNameEn').value.trim();
+        let catId = document.getElementById('prodCategoryId').value;
+        let price = parseFloat(document.getElementById('prodPrice').value);
+        let offerPrice = parseFloat(document.getElementById('prodOfferPrice').value) || null;
+        let image = document.getElementById('prodImage').value;
+        let desc_ar = document.getElementById('prodDescAr').value;
+        let desc_en = document.getElementById('prodDescEn').value;
+        let isOffer = document.getElementById('prodIsOffer').checked;
+        if(!name_ar || !name_en || isNaN(price)) return alert("بيانات ناقصة");
+        if(id) {
+            let index = menuData.products.findIndex(p=>p.id===id);
+            if(index!==-1) menuData.products[index] = { ...menuData.products[index], name_ar, name_en, catId, price, offerPrice, image, description_ar:desc_ar, description_en:desc_en, isOffer };
+        } else {
+            let newId = 'prod_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+            menuData.products.push({ id:newId, catId, name_ar, name_en, price, offerPrice, image, description_ar:desc_ar, description_en:desc_en, isOffer });
+        }
+        saveMenuData(); closeProductModal(); renderProductsList(); populateFilters();
+    }
+    function closeProductModal() { document.getElementById('productModal').style.display = 'none'; }
+    function renderCouponsList() {
+        let container = document.getElementById('couponsList'); container.innerHTML = '';
+        couponsList.forEach((c,i)=>{ let div=document.createElement('div'); div.className='item-row'; div.innerHTML=`<span>${c.code} - خصم ${c.discount}%</span><button class="small-btn btn-del" data-idx="${i}">حذف</button>`; container.appendChild(div); });
+        document.querySelectorAll('[data-idx].btn-del').forEach(btn=>btn.onclick=()=>{ couponsList.splice(parseInt(btn.dataset.idx),1); saveCoupons(); renderCouponsList(); });
+    }
+    function renderAdminsList() {
+        let container = document.getElementById('adminsList'); container.innerHTML = '';
+        adminsList.forEach((adm,i)=>{ let div=document.createElement('div'); div.className='item-row'; div.innerHTML=`<span>${adm.username}</span><button class="small-btn btn-del" data-idx="${i}" ${adm.username==='admin'?'disabled':''}>حذف</button>`; container.appendChild(div); });
+        document.querySelectorAll('[data-idx].btn-del').forEach(btn=>btn.onclick=()=>{ if(adminsList[parseInt(btn.dataset.idx)].username==='admin') return alert("لا يمكن حذف المدير الأساسي"); adminsList.splice(parseInt(btn.dataset.idx),1); saveAdmins(); renderAdminsList(); });
+    }
+    function refreshUI() { renderCategoriesList(); renderProductsList(); renderCouponsList(); renderAdminsList(); populateFilters(); }
+    function bindActions() {
+        document.getElementById('addCategoryBtn').onclick = () => { let ar=document.getElementById('newCatNameAr').value.trim(), en=document.getElementById('newCatNameEn').value.trim(); if(ar&&en){ menuData.categories.push({ id:'cat_'+Date.now(), name_ar:ar, name_en:en, order:menuData.categories.length+1 }); saveMenuData(); refreshUI(); document.getElementById('newCatNameAr').value=''; document.getElementById('newCatNameEn').value=''; } else alert("املأ الحقول"); };
+        document.getElementById('addProductBtn').onclick = () => openProductModal(null);
+        document.getElementById('saveProductBtn').onclick = saveProduct;
+        document.getElementById('cancelProductBtn').onclick = closeProductModal;
+        document.getElementById('addCouponBtn').onclick = () => { let code=document.getElementById('newCouponCode').value.trim().toUpperCase(), disc=parseInt(document.getElementById('newCouponDisc').value); if(code&&disc>0&&disc<=100){ if(couponsList.find(c=>c.code===code)) return alert("الكود موجود"); couponsList.push({code, discount:disc, type:"percent"}); saveCoupons(); renderCouponsList(); document.getElementById('newCouponCode').value=''; document.getElementById('newCouponDisc').value=''; } else alert("أدخل كود ونسبة صحيحة"); };
+        document.getElementById('addAdminBtn').onclick = () => { let u=document.getElementById('newAdminUser').value.trim(), p=document.getElementById('newAdminPass').value.trim(); if(u&&p){ if(adminsList.find(a=>a.username===u)) return alert("موجود"); adminsList.push({username:u, password:p}); saveAdmins(); renderAdminsList(); document.getElementById('newAdminUser').value=''; document.getElementById('newAdminPass').value=''; } else alert("املأ البيانات"); };
+        document.getElementById('changeOwnPassBtn').onclick = () => { if(currentLoggedAdmin){ let newPass=prompt("كلمة المرور الجديدة"); if(newPass&&newPass.length>=3){ let idx=adminsList.findIndex(a=>a.username===currentLoggedAdmin.username); if(idx!==-1){ adminsList[idx].password=newPass; saveAdmins(); alert("تم التغيير"); renderAdminsList(); }}}};
+    }
+    function checkSession() { let sess = sessionStorage.getItem('burger_admin_session'); if(sess){ let u=JSON.parse(sess); if(adminsList.find(a=>a.username===u.username && a.password===u.password)){ currentLoggedAdmin=u; showAdminPanel(true); return true; } } showAdminPanel(false); return false; }
+    function showAdminPanel(isLogged) { document.getElementById('loginOverlay').style.display = isLogged ? 'none' : 'flex'; document.getElementById('adminPanel').style.display = isLogged ? 'block' : 'none'; if(isLogged){ document.getElementById('currentAdminName').innerText = currentLoggedAdmin.username; refreshUI(); bindActions(); } }
+    function attemptLogin(username, password) { let a = adminsList.find(ad=>ad.username===username && ad.password===password); if(a){ currentLoggedAdmin = {username:a.username, password:a.password}; sessionStorage.setItem('burger_admin_session', JSON.stringify(currentLoggedAdmin)); showAdminPanel(true); } else document.getElementById('loginError').innerText = "خطأ في بيانات الدخول"; }
+    function init() { loadAllData(); saveAdmins(); checkSession(); document.getElementById('doLoginBtn').onclick = () => attemptLogin(document.getElementById('adminUsername').value, document.getElementById('adminPassword').value); document.getElementById('logoutMainBtn').onclick = () => { sessionStorage.removeItem('burger_admin_session'); showAdminPanel(false); }; }
+    init();
+</script>
+</body>
+              </html>
