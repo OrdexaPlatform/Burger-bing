@@ -3,339 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برجر بينج | لوحة الإدارة المتكاملة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>لوحة تحكم Burger Bing</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background: #f5f0e8; }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .login-card { background: white; max-width: 400px; width: 90%; padding: 2rem; border-radius: 40px; text-align: center; }
-        .login-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 60px; border: 1px solid #ddd; }
-        .login-card button { background: #e67e22; color: white; border: none; padding: 12px; width: 100%; border-radius: 60px; font-weight: bold; cursor: pointer; }
-        .admin-container { display: none; padding: 20px; }
-        .admin-header { background: #1f1f1f; color: #ffb347; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-radius: 30px; margin-bottom: 30px; flex-wrap: wrap; }
-        .logout-btn, .back-menu { background: #e67e22; border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; margin: 5px; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 30px; }
-        .card { background: white; border-radius: 35px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .card h3 { border-right: 8px solid #e67e22; padding-right: 15px; margin-bottom: 20px; }
-        .item-list { max-height: 320px; overflow-y: auto; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; background: #fef3e4; margin: 8px 0; padding: 8px 12px; border-radius: 60px; flex-wrap: wrap; gap: 8px; }
-        .small-btn { background: #e67e22; border: none; padding: 6px 12px; border-radius: 40px; color: white; margin: 0 3px; cursor: pointer; }
-        .btn-del { background: #c0392b; }
-        .btn-edit { background: #2c6e2f; }
-        .form-group { margin: 15px 0; }
-        input, select, textarea { width: 100%; padding: 10px; border-radius: 60px; border: 1px solid #ccc; margin-top: 8px; }
-        .primary-btn { background: #e67e22; color: white; padding: 10px 20px; border: none; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .sub-card { background: #fff6e8; margin-top: 20px; padding: 15px; border-radius: 28px; }
-        hr { margin: 20px 0; }
-        .image-preview { max-width: 60px; max-height: 60px; border-radius: 12px; margin-right: 8px; }
-        .currency-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        @media (max-width: 700px) { .dashboard { grid-template-columns: 1fr; } }
+        /* تنسيق خاص للأدمن */
+        .admin-login {
+            max-width: 400px;
+            margin: 80px auto;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .admin-dashboard {
+            display: none;
+        }
+        .admin-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 30px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .tab-btn.active {
+            background: #ff6b00;
+            color: black;
+        }
+        .tab-content {
+            display: none;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .admin-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .products-table, .orders-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            text-align: right;
+        }
+        button.small-btn {
+            padding: 5px 10px;
+            margin: 2px;
+            font-size: 12px;
+        }
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #ff6b00;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
-<div id="loginOverlay" class="login-overlay">
-    <div class="login-card">
-        <h2><i class="fas fa-utensils"></i> برجر بينج | المدير</h2>
-        <input type="text" id="adminUsername" placeholder="اسم المستخدم" value="admin">
-        <input type="password" id="adminPassword" placeholder="كلمة المرور">
-        <button id="doLoginBtn">دخول <i class="fas fa-arrow-left"></i></button>
-        <div id="loginError" style="color:red;"></div>
+<div id="admin-root">
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="admin-login">
+        <h2 style="text-align:center">🔐 دخول الأدمن</h2>
+        <input type="text" id="adminUsername" placeholder="اسم المستخدم" class="form-input">
+        <input type="password" id="adminPassword" placeholder="كلمة المرور" class="form-input">
+        <button id="loginBtn" class="btn-primary" style="width:100%">دخول</button>
+        <div id="loginError" style="color:red; margin-top:10px"></div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="dashboard" class="admin-dashboard">
+        <div class="container">
+            <div style="display:flex; justify-content: space-between; align-items: center;">
+                <h1>لوحة تحكم Burger Bing</h1>
+                <button id="logoutBtn" class="btn-secondary">تسجيل الخروج</button>
+            </div>
+            <div class="admin-tabs" id="adminTabs">
+                <button class="tab-btn active" data-tab="products">المنتجات</button>
+                <button class="tab-btn" data-tab="categories">الأقسام</button>
+                <button class="tab-btn" data-tab="orders">الطلبات</button>
+                <button class="tab-btn" data-tab="locations">المحافظات والمدن</button>
+                <button class="tab-btn" data-tab="stats">الإحصائيات</button>
+                <button class="tab-btn" data-tab="settings">الإعدادات</button>
+                <button class="tab-btn" data-tab="backup">النسخ الاحتياطي</button>
+                <button class="tab-btn" data-tab="exports">تصدير الطلبات</button>
+            </div>
+            <div id="tabProducts" class="tab-content active">جاري التحميل...</div>
+            <div id="tabCategories" class="tab-content">جاري التحميل...</div>
+            <div id="tabOrders" class="tab-content">جاري التحميل...</div>
+            <div id="tabLocations" class="tab-content">جاري التحميل...</div>
+            <div id="tabStats" class="tab-content">جاري التحميل...</div>
+            <div id="tabSettings" class="tab-content">جاري التحميل...</div>
+            <div id="tabBackup" class="tab-content">جاري التحميل...</div>
+            <div id="tabExports" class="tab-content">جاري التحميل...</div>
+        </div>
+        <button id="darkModeToggleAdmin" class="dark-mode-toggle"><i class="fas fa-moon"></i></button>
     </div>
 </div>
-
-<div id="adminPanel" class="admin-container">
-    <div class="admin-header">
-        <div><h2><i class="fas fa-crown"></i> لوحة إدارة برجر بينج</h2><span id="currentAdminName">admin</span></div>
-        <div>
-            <a href="index.html" target="_blank" class="back-menu" style="background:#444; text-decoration:none;">معاينة المنيو</a>
-            <button id="logoutMainBtn" class="logout-btn">خروج</button>
-        </div>
-    </div>
-    <div class="dashboard">
-        <!-- الأقسام -->
-        <div class="card">
-            <h3><i class="fas fa-tags"></i> الأقسام</h3>
-            <div id="categoriesList" class="item-list"></div>
-            <div class="sub-card">
-                <h4>➕ إضافة قسم</h4>
-                <input type="text" id="newCatNameAr" placeholder="الاسم بالعربية">
-                <input type="text" id="newCatNameEn" placeholder="Name in English">
-                <button id="addCategoryBtn" class="primary-btn">إضافة قسم</button>
-            </div>
-        </div>
-        <!-- المنتجات مع رفع الصور -->
-        <div class="card">
-            <h3><i class="fas fa-hamburger"></i> المنتجات</h3>
-            <div class="form-group">
-                <select id="productCatFilter"></select>
-                <button id="addProductBtn" class="small-btn" style="background:#2c6e2f;">➕ منتج جديد</button>
-            </div>
-            <div id="productsList" class="item-list"></div>
-            <div id="productModal" style="display:none; background:#fef2e0; border-radius: 30px; padding: 15px; margin-top: 15px;">
-                <h4 id="productFormTitle">إضافة منتج</h4>
-                <input type="hidden" id="editProductId">
-                <input type="text" id="prodNameAr" placeholder="الاسم بالعربية" required>
-                <input type="text" id="prodNameEn" placeholder="Name in English" required>
-                <select id="prodCategoryId"></select>
-                <input type="number" id="prodPrice" placeholder="السعر (بالجنيه المصري)" required>
-                <input type="number" id="prodOfferPrice" placeholder="سعر العرض (اختياري)">
-                <label>صورة المنتج (رفع من الجهاز):</label>
-                <input type="file" id="prodImageFile" accept="image/*">
-                <div id="prodImagePreview" style="margin: 10px 0;"></div>
-                <textarea id="prodDescAr" placeholder="وصف بالعربية"></textarea>
-                <textarea id="prodDescEn" placeholder="Description in English"></textarea>
-                <label><input type="checkbox" id="prodIsOffer"> عرض خاص</label>
-                <div><button id="saveProductBtn" class="small-btn">💾 حفظ</button><button id="cancelProductBtn" class="small-btn" style="background:#777;">إلغاء</button></div>
-            </div>
-        </div>
-        <!-- الكوبونات والعملات والأدمن -->
-        <div class="card">
-            <h3><i class="fas fa-ticket-alt"></i> كوبونات الخصم</h3>
-            <div id="couponsList" class="item-list"></div>
-            <div class="sub-card">
-                <input type="text" id="newCouponCode" placeholder="كود الخصم">
-                <input type="number" id="newCouponDisc" placeholder="نسبة الخصم %">
-                <button id="addCouponBtn" class="primary-btn">إضافة كوبون</button>
-            </div>
-            <hr>
-            <h3><i class="fas fa-coins"></i> إدارة العملات</h3>
-            <div id="currenciesList" class="item-list"></div>
-            <div class="sub-card">
-                <h4>➕ إضافة / تعديل عملة</h4>
-                <input type="text" id="currencyName" placeholder="اسم العملة (مثال: دولار أمريكي)">
-                <input type="text" id="currencySymbol" placeholder="الرمز (مثال: $)">
-                <input type="number" id="currencyRate" placeholder="سعر الصرف مقابل الجنيه المصري (1 جنيه = ?)">
-                <button id="addCurrencyBtn" class="primary-btn">إضافة عملة</button>
-                <small>ملاحظة: الجنيه المصري مضاف افتراضياً بسعر 1</small>
-            </div>
-            <hr>
-            <h3><i class="fas fa-users-cog"></i> إدارة الأدمن</h3>
-            <div id="adminsList" class="item-list"></div>
-            <div class="sub-card">
-                <h4>➕ إضافة أدمن</h4>
-                <input type="text" id="newAdminUser" placeholder="اسم المستخدم">
-                <input type="password" id="newAdminPass" placeholder="كلمة المرور">
-                <button id="addAdminBtn" class="primary-btn">إضافة أدمن</button>
-                <button id="changeOwnPassBtn" class="primary-btn" style="background:#e67e22;">🔐 تغيير كلمة مروري</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // ------------------- التخزين -------------------
-    const STORAGE_MENU = 'burger_menu_data';
-    const STORAGE_COUPONS = 'burger_coupons';
-    const STORAGE_ADMINS = 'burger_admins';
-    const STORAGE_CURRENCIES = 'burger_currencies';
-    
-    let menuData = { categories: [], products: [] };
-    let couponsList = [];
-    let adminsList = [];
-    let currenciesList = []; // { name, symbol, rate, isDefault? }
-    let currentLoggedAdmin = null;
-
-    // تحميل البيانات
-    function loadAllData() {
-        let storedMenu = localStorage.getItem(STORAGE_MENU);
-        if(storedMenu) menuData = JSON.parse(storedMenu);
-        else {
-            menuData = {
-                categories: [
-                    { id: "cat1", name_ar: "🍔 برجر كلاسيك", name_en: "Classic Burgers", order: 1 },
-                    { id: "cat2", name_ar: "🍟 أطباق جانبية", name_en: "Sides", order: 2 },
-                    { id: "cat3", name_ar: "🥤 مشروبات", name_en: "Drinks", order: 3 }
-                ],
-                products: [
-                    { id: "p1", catId: "cat1", name_ar: "برجر دبل تشيز", name_en: "Double Cheeseburger", price: 45, offerPrice: 35, imageData: "", description_ar: "لحم أنجوس + جبنة", description_en: "Angus beef + cheese", isOffer: true },
-                    { id: "p2", catId: "cat2", name_ar: "بطاطس بالجبنة", name_en: "Cheese Fries", price: 25, offerPrice: null, imageData: "", description_ar: "جبنة شيدر", description_en: "Cheddar cheese", isOffer: false }
-                ]
-            };
-            saveMenuData();
-        }
-        let storedCoupons = localStorage.getItem(STORAGE_COUPONS);
-        if(storedCoupons) couponsList = JSON.parse(storedCoupons);
-        else couponsList = [{ code: "WELCOME10", discount: 10, type: "percent" }, { code: "BING20", discount: 20, type: "percent" }];
-        
-        let storedAdmins = localStorage.getItem(STORAGE_ADMINS);
-        if(storedAdmins) adminsList = JSON.parse(storedAdmins);
-        else adminsList = [{ username: "admin", password: "200300" }];
-        
-        let storedCurrencies = localStorage.getItem(STORAGE_CURRENCIES);
-        if(storedCurrencies) currenciesList = JSON.parse(storedCurrencies);
-        else {
-            currenciesList = [
-                { name: "جنيه مصري", symbol: "ج.م", rate: 1, isDefault: true },
-                { name: "دولار أمريكي", symbol: "$", rate: 0.02, isDefault: false },
-                { name: "يورو", symbol: "€", rate: 0.0185, isDefault: false },
-                { name: "ريال سعودي", symbol: "ر.س", rate: 0.075, isDefault: false }
-            ];
-            saveCurrencies();
-        }
-    }
-    function saveMenuData() { localStorage.setItem(STORAGE_MENU, JSON.stringify(menuData)); }
-    function saveCoupons() { localStorage.setItem(STORAGE_COUPONS, JSON.stringify(couponsList)); }
-    function saveAdmins() { localStorage.setItem(STORAGE_ADMINS, JSON.stringify(adminsList)); }
-    function saveCurrencies() { localStorage.setItem(STORAGE_CURRENCIES, JSON.stringify(currenciesList)); }
-
-    // عرض الأقسام
-    function renderCategoriesList() {
-        const container = document.getElementById('categoriesList');
-        container.innerHTML = '';
-        menuData.categories.forEach(cat => {
-            let div = document.createElement('div'); div.className = 'item-row';
-            div.innerHTML = `<span><strong>${cat.name_ar} | ${cat.name_en}</strong></span>
-                <div><button class="small-btn btn-edit" data-id="${cat.id}">✏️</button><button class="small-btn btn-del" data-id="${cat.id}">🗑️</button></div>`;
-            container.appendChild(div);
-        });
-        document.querySelectorAll('[data-id].btn-del').forEach(btn => btn.onclick = () => { if(confirm('حذف القسم وجميع منتجاته؟')) { menuData.categories = menuData.categories.filter(c=>c.id!==btn.dataset.id); menuData.products = menuData.products.filter(p=>p.catId!==btn.dataset.id); saveMenuData(); renderCategoriesList(); renderProductsList(); populateFilters(); } });
-        document.querySelectorAll('[data-id].btn-edit').forEach(btn => btn.onclick = () => { let cat = menuData.categories.find(c=>c.id===btn.dataset.id); let newAr = prompt("اسم عربي", cat.name_ar); let newEn = prompt("اسم إنجليزي", cat.name_en); if(newAr) cat.name_ar=newAr; if(newEn) cat.name_en=newEn; saveMenuData(); renderCategoriesList(); renderProductsList(); populateFilters(); });
-    }
-    function populateFilters() {
-        let filter = document.getElementById('productCatFilter'); if(filter){ filter.innerHTML='<option value="ALL">كل الأقسام</option>'; menuData.categories.forEach(c=>filter.innerHTML+=`<option value="${c.id}">${c.name_ar}</option>`); filter.onchange=()=>renderProductsList(); }
-        let selectCat = document.getElementById('prodCategoryId'); if(selectCat){ selectCat.innerHTML=''; menuData.categories.forEach(c=>selectCat.innerHTML+=`<option value="${c.id}">${c.name_ar}</option>`); }
-    }
-    // عرض المنتجات مع الصور المخزنة base64
-    function renderProductsList() {
-        let container = document.getElementById('productsList'); if(!container) return;
-        let filter = document.getElementById('productCatFilter')?.value || 'ALL';
-        let filtered = filter==='ALL' ? menuData.products : menuData.products.filter(p=>p.catId===filter);
-        container.innerHTML = '';
-        filtered.forEach(prod => {
-            let div = document.createElement('div'); div.className = 'item-row';
-            let imgHtml = prod.imageData ? `<img src="${prod.imageData}" class="image-preview" style="width:40px;height:40px;object-fit:cover;">` : '<span style="font-size:12px;">📷 لا صورة</span>';
-            div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;">${imgHtml}<div><strong>${prod.name_ar}</strong> (${prod.price} ج.م)</div></div>
-                <div><button class="small-btn btn-edit" data-prod='${JSON.stringify(prod)}'>✏️</button><button class="small-btn btn-del" data-id="${prod.id}">🗑️</button></div>`;
-            container.appendChild(div);
-        });
-        document.querySelectorAll('[data-id].btn-del').forEach(btn => btn.onclick = () => { menuData.products = menuData.products.filter(p=>p.id!==btn.dataset.id); saveMenuData(); renderProductsList(); });
-        document.querySelectorAll('[data-prod].btn-edit').forEach(btn => btn.onclick = () => openProductModal(JSON.parse(btn.dataset.prod)));
-    }
-    // فتح نافذة المنتج مع معاينة الصورة
-    function openProductModal(prod=null) {
-        let modal = document.getElementById('productModal');
-        document.getElementById('editProductId').value = prod ? prod.id : '';
-        document.getElementById('prodNameAr').value = prod ? prod.name_ar : '';
-        document.getElementById('prodNameEn').value = prod ? prod.name_en : '';
-        document.getElementById('prodCategoryId').value = prod ? prod.catId : (menuData.categories[0]?.id || '');
-        document.getElementById('prodPrice').value = prod ? prod.price : '';
-        document.getElementById('prodOfferPrice').value = prod?.offerPrice || '';
-        document.getElementById('prodDescAr').value = prod?.description_ar || '';
-        document.getElementById('prodDescEn').value = prod?.description_en || '';
-        document.getElementById('prodIsOffer').checked = prod?.isOffer || false;
-        let previewDiv = document.getElementById('prodImagePreview');
-        if(prod && prod.imageData) previewDiv.innerHTML = `<img src="${prod.imageData}" style="max-width:100px; border-radius:12px;"><br><small>الصورة الحالية</small>`;
-        else previewDiv.innerHTML = '';
-        document.getElementById('productFormTitle').innerText = prod ? 'تعديل منتج' : 'إضافة منتج';
-        modal.style.display = 'block';
-        document.getElementById('prodImageFile').value = ''; // مسح الملف السابق
-    }
-    // حفظ المنتج مع تضمين الصورة base64 إذا تم رفعها
-    function saveProduct() {
-        let id = document.getElementById('editProductId').value;
-        let name_ar = document.getElementById('prodNameAr').value.trim();
-        let name_en = document.getElementById('prodNameEn').value.trim();
-        let catId = document.getElementById('prodCategoryId').value;
-        let price = parseFloat(document.getElementById('prodPrice').value);
-        let offerPrice = parseFloat(document.getElementById('prodOfferPrice').value) || null;
-        let desc_ar = document.getElementById('prodDescAr').value;
-        let desc_en = document.getElementById('prodDescEn').value;
-        let isOffer = document.getElementById('prodIsOffer').checked;
-        if(!name_ar || !name_en || isNaN(price)) return alert("بيانات ناقصة");
-        
-        let imageData = null;
-        const fileInput = document.getElementById('prodImageFile');
-        if(fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imageData = e.target.result;
-                saveProductFinal(id, name_ar, name_en, catId, price, offerPrice, desc_ar, desc_en, isOffer, imageData);
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        } else {
-            // الاحتفاظ بالصورة القديمة إذا كانت موجودة ولم يتم رفع جديدة
-            if(id) {
-                let existing = menuData.products.find(p=>p.id===id);
-                imageData = existing ? existing.imageData : null;
-            }
-            saveProductFinal(id, name_ar, name_en, catId, price, offerPrice, desc_ar, desc_en, isOffer, imageData);
-        }
-    }
-    function saveProductFinal(id, name_ar, name_en, catId, price, offerPrice, desc_ar, desc_en, isOffer, imageData) {
-        if(id) {
-            let index = menuData.products.findIndex(p=>p.id===id);
-            if(index!==-1) {
-                menuData.products[index] = { ...menuData.products[index], name_ar, name_en, catId, price, offerPrice, description_ar:desc_ar, description_en:desc_en, isOffer, imageData: imageData || menuData.products[index].imageData };
-            }
-        } else {
-            let newId = 'prod_'+Date.now()+'_'+Math.floor(Math.random()*1000);
-            menuData.products.push({ id:newId, catId, name_ar, name_en, price, offerPrice, description_ar:desc_ar, description_en:desc_en, isOffer, imageData: imageData || '' });
-        }
-        saveMenuData();
-        closeProductModal();
-        renderProductsList();
-        populateFilters();
-    }
-    function closeProductModal() { document.getElementById('productModal').style.display = 'none'; }
-    
-    // إدارة الكوبونات
-    function renderCouponsList() {
-        let container = document.getElementById('couponsList'); container.innerHTML = '';
-        couponsList.forEach((c,i)=>{ let div=document.createElement('div'); div.className='item-row'; div.innerHTML=`<span>${c.code} - خصم ${c.discount}%</span><button class="small-btn btn-del" data-idx="${i}">حذف</button>`; container.appendChild(div); });
-        document.querySelectorAll('[data-idx].btn-del').forEach(btn=>btn.onclick=()=>{ couponsList.splice(parseInt(btn.dataset.idx),1); saveCoupons(); renderCouponsList(); });
-    }
-    // إدارة العملات
-    function renderCurrenciesList() {
-        let container = document.getElementById('currenciesList'); if(!container) return;
-        container.innerHTML = '';
-        currenciesList.forEach((cur, idx) => {
-            let div = document.createElement('div'); div.className = 'item-row';
-            div.innerHTML = `<span><strong>${cur.name}</strong> (${cur.symbol}) - السعر: 1 ج.م = ${cur.rate} ${cur.symbol}</span>
-                <div><button class="small-btn btn-edit" data-curidx="${idx}">✏️</button><button class="small-btn btn-del" data-curidx="${idx}">🗑️</button></div>`;
-            container.appendChild(div);
-        });
-        document.querySelectorAll('[data-curidx].btn-del').forEach(btn => btn.onclick = () => { let idx = parseInt(btn.dataset.curidx); if(currenciesList[idx].isDefault) return alert("لا يمكن حذف العملة الأساسية"); currenciesList.splice(idx,1); saveCurrencies(); renderCurrenciesList(); });
-        document.querySelectorAll('[data-curidx].btn-edit').forEach(btn => btn.onclick = () => { let idx = parseInt(btn.dataset.curidx); let cur = currenciesList[idx]; let newRate = prompt("سعر الصرف مقابل الجنيه (1 جنيه = ?)", cur.rate); if(newRate && !isNaN(newRate)) { cur.rate = parseFloat(newRate); saveCurrencies(); renderCurrenciesList(); } });
-    }
-    function addCurrency() {
-        let name = document.getElementById('currencyName').value.trim();
-        let symbol = document.getElementById('currencySymbol').value.trim();
-        let rate = parseFloat(document.getElementById('currencyRate').value);
-        if(!name || !symbol || isNaN(rate) || rate<=0) return alert("بيانات غير صالحة");
-        currenciesList.push({ name, symbol, rate, isDefault: false });
-        saveCurrencies();
-        renderCurrenciesList();
-        document.getElementById('currencyName').value = '';
-        document.getElementById('currencySymbol').value = '';
-        document.getElementById('currencyRate').value = '';
-    }
-    // إدارة الأدمن
-    function renderAdminsList() {
-        let container = document.getElementById('adminsList'); container.innerHTML = '';
-        adminsList.forEach((adm,i)=>{ let div=document.createElement('div'); div.className='item-row'; div.innerHTML=`<span>${adm.username}</span><button class="small-btn btn-del" data-idx="${i}" ${adm.username==='admin'?'disabled':''}>حذف</button>`; container.appendChild(div); });
-        document.querySelectorAll('[data-idx].btn-del').forEach(btn=>btn.onclick=()=>{ if(adminsList[parseInt(btn.dataset.idx)].username==='admin') return alert("لا يمكن حذف المدير الأساسي"); adminsList.splice(parseInt(btn.dataset.idx),1); saveAdmins(); renderAdminsList(); });
-    }
-    
-    function refreshUI() { renderCategoriesList(); renderProductsList(); renderCouponsList(); renderCurrenciesList(); renderAdminsList(); populateFilters(); }
-    
-    function bindActions() {
-        document.getElementById('addCategoryBtn').onclick = () => { let ar=document.getElementById('newCatNameAr').value.trim(), en=document.getElementById('newCatNameEn').value.trim(); if(ar&&en){ menuData.categories.push({ id:'cat_'+Date.now(), name_ar:ar, name_en:en, order:menuData.categories.length+1 }); saveMenuData(); refreshUI(); document.getElementById('newCatNameAr').value=''; document.getElementById('newCatNameEn').value=''; } else alert("املأ الحقول"); };
-        document.getElementById('addProductBtn').onclick = () => openProductModal(null);
-        document.getElementById('saveProductBtn').onclick = saveProduct;
-        document.getElementById('cancelProductBtn').onclick = closeProductModal;
-        document.getElementById('addCouponBtn').onclick = () => { let code=document.getElementById('newCouponCode').value.trim().toUpperCase(), disc=parseInt(document.getElementById('newCouponDisc').value); if(code&&disc>0&&disc<=100){ if(couponsList.find(c=>c.code===code)) return alert("الكود موجود"); couponsList.push({code, discount:disc, type:"percent"}); saveCoupons(); renderCouponsList(); document.getElementById('newCouponCode').value=''; document.getElementById('newCouponDisc').value=''; } else alert("أدخل كود ونسبة صحيحة"); };
-        document.getElementById('addCurrencyBtn').onclick = addCurrency;
-        document.getElementById('addAdminBtn').onclick = () => { let u=document.getElementById('newAdminUser').value.trim(), p=document.getElementById('newAdminPass').value.trim(); if(u&&p){ if(adminsList.find(a=>a.username===u)) return alert("موجود"); adminsList.push({username:u, password:p}); saveAdmins(); renderAdminsList(); document.getElementById('newAdminUser').value=''; document.getElementById('newAdminPass').value=''; } else alert("املأ البيانات"); };
-        document.getElementById('changeOwnPassBtn').onclick = () => { if(currentLoggedAdmin){ let newPass=prompt("كلمة المرور الجديدة"); if(newPass&&newPass.length>=3){ let idx=adminsList.findIndex(a=>a.username===currentLoggedAdmin.username); if(idx!==-1){ adminsList[idx].password=newPass; saveAdmins(); alert("تم التغيير"); renderAdminsList(); }}}};
-    }
-    // نظام تسجيل الدخول
-    function checkSession() { let sess = sessionStorage.getItem('burger_admin_session'); if(sess){ let u=JSON.parse(sess); if(adminsList.find(a=>a.username===u.username && a.password===u.password)){ currentLoggedAdmin=u; showAdminPanel(true); return true; } } showAdminPanel(false); return false; }
-    function showAdminPanel(isLogged) { document.getElementById('loginOverlay').style.display = isLogged ? 'none' : 'flex'; document.getElementById('adminPanel').style.display = isLogged ? 'block' : 'none'; if(isLogged){ document.getElementById('currentAdminName').innerText = currentLoggedAdmin.username; refreshUI(); bindActions(); } }
-    function attemptLogin(username, password) { let a = adminsList.find(ad=>ad.username===username && ad.password===password); if(a){ currentLoggedAdmin = {username:a.username, password:a.password}; sessionStorage.setItem('burger_admin_session', JSON.stringify(currentLoggedAdmin)); showAdminPanel(true); } else document.getElementById('loginError').innerText = "خطأ في بيانات الدخول"; }
-    function init() { loadAllData(); saveAdmins(); saveCurrencies(); checkSession(); document.getElementById('doLoginBtn').onclick = () => attemptLogin(document.getElementById('adminUsername').value, document.getElementById('adminPassword').value); document.getElementById('logoutMainBtn').onclick = () => { sessionStorage.removeItem('burger_admin_session'); showAdminPanel(false); }; }
-    init();
-</script>
+<script src="admin.js"></script>
 </body>
-    </html>
+</html>
