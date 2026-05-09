@@ -2,248 +2,136 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برجر بينج | قائمة الطعام - سلة الطلبات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="أشهى البرجر والساندوتشات في مكان واحد - Burger Bing">
+    <title>Burger Bing | المنيو الرئيسي</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background: #fef7e8; }
-        .header { background: #111; color: #ffb347; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; gap: 10px; }
-        .logo h1 { font-size: 1.8rem; }
-        .lang-btn, .cart-icon-btn, .currency-select { background: #ffb347; border: none; padding: 0.5rem 1rem; border-radius: 40px; font-weight: bold; cursor: pointer; }
-        .currency-select { background: #333; color: white; }
-        .coupon-bar { background: #2c2c2c; padding: 0.8rem 2rem; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; color: white; }
-        .container { max-width: 1300px; margin: 2rem auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
-        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
-        .category-tabs { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 25px; }
-        .cat-btn { background: #f0e1cc; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 700; cursor: pointer; }
-        .cat-btn.active { background: #ff7e05; color: white; }
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
-        .product-card { background: white; border-radius: 30px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08); transition: 0.2s; }
-        .product-img { width: 100%; height: 180px; object-fit: cover; background: #f5e2c1; }
-        .product-info { padding: 15px; }
-        .product-title { font-size: 1.3rem; font-weight: 800; }
-        .price { font-size: 1.4rem; font-weight: 800; color: #e67e22; margin: 8px 0; }
-        .add-to-cart { background: #e67e22; color: white; border: none; padding: 8px 15px; border-radius: 40px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 8px; }
-        /* السلة */
-        .cart-sidebar { background: white; border-radius: 30px; padding: 20px; position: sticky; top: 90px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); height: fit-content; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; flex-wrap: wrap; }
-        .cart-item-quantity { display: flex; gap: 8px; align-items: center; }
-        .cart-total { font-size: 1.3rem; font-weight: bold; margin: 15px 0; }
-        .checkout-btn { background: #2c6e2f; color: white; width: 100%; padding: 12px; border-radius: 40px; font-weight: bold; border: none; cursor: pointer; }
-        footer { text-align: center; padding: 30px; background: #111; color: #ffb347; margin-top: 50px; }
+        /* إضافات خاصة بالـ Splash و Loader */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            flex-direction: column;
+            color: white;
+            font-size: 2rem;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ff6b00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hide-splash {
+            opacity: 0;
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
-<div class="header">
-    <div class="logo"><h1>🍔 برجر بينج <span>Burger Bing</span></h1></div>
-    <div style="display: flex; gap: 10px;">
-        <select id="currencySelector" class="currency-select"></select>
-        <button class="lang-btn" id="toggleLangBtn"><i class="fas fa-globe"></i> English</button>
-        <button class="cart-icon-btn" id="viewCartBtn"><i class="fas fa-shopping-cart"></i> سلة (<span id="cartCount">0</span>)</button>
-    </div>
-</div>
-<div class="coupon-bar">
-    <span><i class="fas fa-tag"></i> <span id="couponLabel">كود خصم</span> :</span>
-    <input type="text" id="couponCodeInput" placeholder="أدخل الكود">
-    <button id="applyCouponBtn"><i class="fas fa-check"></i> تطبيق</button>
-    <span id="couponMsg"></span>
-</div>
-<div class="container">
-    <div>
-        <div class="category-tabs" id="categoryTabs"></div>
-        <div class="products-grid" id="productsGrid"></div>
-    </div>
-    <div class="cart-sidebar" id="cartSidebar">
-        <h3><i class="fas fa-shopping-bag"></i> سلة الطلب</h3>
-        <div id="cartItemsList">السلة فارغة</div>
-        <div id="cartTotal" class="cart-total"></div>
-        <button id="checkoutBtn" class="checkout-btn">إتمام الطلب</button>
-    </div>
-</div>
-<footer><p>🔥 برجر بينج - طلبك يوصل لحد بابك 🔥</p></footer>
 
+<div id="splash-screen">
+    <div class="loader"></div>
+    <h2>Burger Bing</h2>
+    <p>أطيب ما تذوقت...</p>
+</div>
+
+<!-- Loader أثناء تحميل المنتجات -->
+<div id="page-loader" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; color:white;">
+    <div class="loader"></div>
+    <p>جاري التحميل...</p>
+</div>
+
+<!-- Navbar ثابت -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo" id="site-logo">
+            <img id="logo-img" src="https://via.placeholder.com/40?text=BB" alt="Logo">
+            <span id="site-name">Burger Bing</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="active"><i class="fas fa-home"></i> <span>الرئيسية</span></a>
+            <a href="cart.html"><i class="fas fa-shopping-cart"></i> <span>السلة</span> <span id="cart-badge" class="cart-badge">0</span></a>
+        </div>
+        <div class="mobile-bottom-nav">
+            <a href="index.html" class="active"><i class="fas fa-utensils"></i><span>منيو</span></a>
+            <a href="cart.html"><i class="fas fa-shopping-cart"></i><span>سلة</span><span id="mobile-cart-badge" class="cart-badge-mobile">0</span></a>
+        </div>
+    </div>
+</nav>
+
+<!-- زر Floating للسلة -->
+<a href="cart.html" class="floating-cart" id="floatingCart">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="floating-cart-count">0</span>
+</a>
+
+<!-- محتوى الصفحة -->
+<main class="container">
+    <!-- سلايدر -->
+    <div class="slider-container">
+        <div class="slider" id="mainSlider">
+            <div class="slide"><img src="https://picsum.photos/1200/400?random=1" alt="عرض 1"><div class="slide-caption">عرض خاص: برجر دبل ب 99 جنيه</div></div>
+            <div class="slide"><img src="https://picsum.photos/1200/400?random=2" alt="عرض 2"><div class="slide-caption">وجبة العائلة ب 199 جنيه</div></div>
+            <div class="slide"><img src="https://picsum.photos/1200/400?random=3" alt="عرض 3"><div class="slide-caption">توصيل مجاني للطلبات فوق 300 جنيه</div></div>
+        </div>
+        <button class="slider-btn prev" id="prevSlide"><i class="fas fa-chevron-right"></i></button>
+        <button class="slider-btn next" id="nextSlide"><i class="fas fa-chevron-left"></i></button>
+    </div>
+
+    <!-- بانر عروض اليوم -->
+    <div class="offer-banner">
+        <i class="fas fa-tags"></i> عروض اليوم: خصم 20% على البرجر المشوي | اطلب الآن واحصل على بطاطس مجانية!
+    </div>
+
+    <!-- شريط البحث والفلتر -->
+    <div class="filter-bar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="ابحث عن وجبتك المفضلة...">
+        </div>
+        <div class="categories-filter" id="categoriesFilter">
+            <!-- سيتم ملؤها بواسطة JS -->
+        </div>
+    </div>
+
+    <!-- المنتجات الأكثر طلباً -->
+    <section class="top-products">
+        <h2><i class="fas fa-fire"></i> الأكثر طلباً</h2>
+        <div class="products-grid" id="topProductsGrid"></div>
+    </section>
+
+    <!-- جميع المنتجات حسب الأقسام -->
+    <div id="productsContainer"></div>
+</main>
+
+<script src="app.js"></script>
 <script>
-    let menuData = { categories: [], products: [] };
-    let couponsList = [];
-    let currenciesList = [];
-    let currentLang = localStorage.getItem('burger_lang') || 'ar';
-    let activeCategoryId = null;
-    let appliedDiscount = 0;  // نسبة الخصم من الكوبون
-    let currentCurrency = null; // كائن العملة المختارة
-    
-    // السلة: { productId, quantity, productData (نسخة من السعر وقت الإضافة) }
-    let cart = JSON.parse(localStorage.getItem('burger_cart')) || [];
-    
-    const translations = {
-        ar: { couponLabel: "كود خصم", applyText: "تطبيق", noProducts: "لا توجد منتجات", offerBadge: "عرض خاص", currency: "العملة", cartEmpty: "السلة فارغة", total: "الإجمالي", checkoutSuccess: "تم إرسال طلبك بنجاح!" },
-        en: { couponLabel: "Coupon Code", applyText: "Apply", noProducts: "No products", offerBadge: "Offer", currency: "Currency", cartEmpty: "Cart is empty", total: "Total", checkoutSuccess: "Order placed successfully!" }
-    };
-    
-    function loadData() {
-        let storedMenu = localStorage.getItem('burger_menu_data');
-        if(storedMenu) menuData = JSON.parse(storedMenu);
-        else { console.warn("No menu data"); menuData = { categories: [], products: [] }; }
-        let storedCoupons = localStorage.getItem('burger_coupons');
-        if(storedCoupons) couponsList = JSON.parse(storedCoupons);
-        let storedCurrencies = localStorage.getItem('burger_currencies');
-        if(storedCurrencies) { currenciesList = JSON.parse(storedCurrencies); }
-        else { currenciesList = [{ name: "جنيه مصري", symbol: "ج.م", rate: 1, isDefault: true }]; }
-        // تعيين العملة الافتراضية
-        if(!currentCurrency) {
-            let defaultCur = currenciesList.find(c=>c.isDefault) || currenciesList[0];
-            currentCurrency = defaultCur;
-        }
-    }
-    function saveCart() { localStorage.setItem('burger_cart', JSON.stringify(cart)); updateCartUI(); }
-    function updateCartUI() {
-        let container = document.getElementById('cartItemsList');
-        let totalSpan = document.getElementById('cartTotal');
-        let cartCountSpan = document.getElementById('cartCount');
-        if(!container) return;
-        if(cart.length === 0) { container.innerHTML = `<div class="cart-item">${translations[currentLang].cartEmpty}</div>`; totalSpan.innerHTML = ''; cartCountSpan.innerText = '0'; return; }
-        let total = 0;
-        let html = '';
-        cart.forEach((item, idx) => {
-            let prod = item.productData;
-            let finalPrice = getProductEffectivePrice(prod);
-            let itemTotal = finalPrice * item.quantity;
-            total += itemTotal;
-            html += `<div class="cart-item">
-                        <div><strong>${currentLang === 'ar' ? prod.name_ar : prod.name_en}</strong><br>${formatPrice(finalPrice)}</div>
-                        <div class="cart-item-quantity">
-                            <button class="small-qty" data-idx="${idx}" data-delta="-1">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="small-qty" data-idx="${idx}" data-delta="1">+</button>
-                            <button class="small-qty" data-idx="${idx}" data-delta="0" style="background:#c0392b;">🗑️</button>
-                        </div>
-                        <div>${formatPrice(itemTotal)}</div>
-                    </div>`;
-        });
-        container.innerHTML = html;
-        totalSpan.innerHTML = `<strong>${translations[currentLang].total}: ${formatPrice(total)}</strong>`;
-        cartCountSpan.innerText = cart.reduce((s,i)=>s+i.quantity,0);
-        // احداث الأزرار
-        document.querySelectorAll('.small-qty').forEach(btn => {
-            btn.onclick = () => {
-                let idx = parseInt(btn.dataset.idx);
-                let delta = parseInt(btn.dataset.delta);
-                if(delta === 0) cart.splice(idx,1);
-                else {
-                    let newQty = cart[idx].quantity + delta;
-                    if(newQty <= 0) cart.splice(idx,1);
-                    else cart[idx].quantity = newQty;
-                }
-                saveCart();
-            };
-        });
-    }
-    function getProductEffectivePrice(prod) {
-        let base = (prod.isOffer && prod.offerPrice) ? prod.offerPrice : prod.price;
-        if(appliedDiscount > 0) base = base - (base * appliedDiscount / 100);
-        return Math.round(base * 100) / 100;
-    }
-    function formatPrice(priceInEGP) {
-        let converted = priceInEGP * currentCurrency.rate;
-        return `${Math.round(converted * 100) / 100} ${currentCurrency.symbol}`;
-    }
-    function renderCategoriesAndProducts() {
-        const catsContainer = document.getElementById("categoryTabs");
-        const productsContainer = document.getElementById("productsGrid");
-        const sortedCats = [...menuData.categories].sort((a,b)=> (a.order||0)-(b.order||0));
-        catsContainer.innerHTML = '';
-        sortedCats.forEach(cat => {
-            const btn = document.createElement('button');
-            btn.classList.add('cat-btn');
-            if(activeCategoryId === cat.id) btn.classList.add('active');
-            btn.innerText = currentLang === 'ar' ? cat.name_ar : cat.name_en;
-            btn.onclick = () => { activeCategoryId = cat.id; renderCategoriesAndProducts(); };
-            catsContainer.appendChild(btn);
-        });
-        if(activeCategoryId === null && sortedCats.length) activeCategoryId = sortedCats[0].id;
-        const filtered = menuData.products.filter(p => p.catId === activeCategoryId);
-        if(filtered.length === 0) { productsContainer.innerHTML = `<div>${translations[currentLang].noProducts}</div>`; return; }
-        productsContainer.innerHTML = '';
-        filtered.forEach(prod => {
-            let price = getProductEffectivePrice(prod);
-            let card = document.createElement('div'); card.className = 'product-card';
-            let imgSrc = prod.imageData && prod.imageData.startsWith('data:') ? prod.imageData : 'https://placehold.co/400x250/F5A623/white?text=🍔';
-            card.innerHTML = `
-                <img class="product-img" src="${imgSrc}" onerror="this.src='https://placehold.co/400x250/F5A623/white?text=🍔'">
-                <div class="product-info">
-                    <div class="product-title">${currentLang === 'ar' ? prod.name_ar : prod.name_en}</div>
-                    <div class="price">${formatPrice(price)}</div>
-                    <div class="desc">${currentLang === 'ar' ? (prod.description_ar || '') : (prod.description_en || '')}</div>
-                    <button class="add-to-cart" data-prod='${JSON.stringify(prod)}'>➕ أضف للسلة</button>
-                </div>`;
-            productsContainer.appendChild(card);
-        });
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.onclick = () => {
-                let prod = JSON.parse(btn.dataset.prod);
-                let existing = cart.find(i => i.productId === prod.id);
-                if(existing) existing.quantity += 1;
-                else cart.push({ productId: prod.id, quantity: 1, productData: prod });
-                saveCart();
-            };
-        });
-    }
-    function setLanguage(lang) {
-        currentLang = lang;
-        localStorage.setItem('burger_lang', lang);
-        document.body.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
-        document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-        document.getElementById("couponLabel").innerText = translations[lang].couponLabel;
-        document.getElementById("applyText").innerText = translations[lang].applyText;
-        renderCategoriesAndProducts();
-        updateCartUI();
-    }
-    function applyCoupon(code) {
-        let found = couponsList.find(c => c.code.toUpperCase() === code.toUpperCase());
-        if(found) { appliedDiscount = found.discount; document.getElementById("couponMsg").innerHTML = `✅ خصم ${found.discount}% فعال`; renderCategoriesAndProducts(); updateCartUI(); }
-        else { document.getElementById("couponMsg").innerHTML = `❌ كود غير صالح`; setTimeout(()=>document.getElementById("couponMsg").innerHTML='',2000); }
-    }
-    function checkout() {
-        if(cart.length === 0) return alert("السلة فارغة");
-        alert(translations[currentLang].checkoutSuccess + "\n" + JSON.stringify(cart.map(i=>({name: i.productData.name_ar, qty:i.quantity})),null,2));
-        cart = []; saveCart();
-    }
-    function loadCurrenciesSelector() {
-        let select = document.getElementById('currencySelector');
-        select.innerHTML = '';
-        currenciesList.forEach(cur => {
-            let opt = document.createElement('option');
-            opt.value = cur.rate;
-            opt.textContent = `${cur.name} (${cur.symbol})`;
-            if(currentCurrency && cur.rate === currentCurrency.rate) opt.selected = true;
-            select.appendChild(opt);
-        });
-        select.onchange = () => {
-            let selectedRate = parseFloat(select.value);
-            let newCur = currenciesList.find(c => c.rate === selectedRate);
-            if(newCur) { currentCurrency = newCur; renderCategoriesAndProducts(); updateCartUI(); }
-        };
-    }
-    function initFrontend() {
-        loadData();
-        loadCurrenciesSelector();
-        if(menuData.categories.length) activeCategoryId = menuData.categories[0].id;
-        setLanguage(currentLang);
-        document.getElementById("toggleLangBtn").onclick = () => setLanguage(currentLang === 'ar' ? 'en' : 'ar');
-        document.getElementById("applyCouponBtn").onclick = () => { let code = document.getElementById("couponCodeInput").value.trim(); if(code) applyCoupon(code); };
-        document.getElementById("checkoutBtn").onclick = checkout;
-        updateCartUI();
-        // إضافة رابط للادمن
-        let header = document.querySelector('.header');
-        let adminLink = document.createElement('a');
-        adminLink.href = "admin.html";
-        adminLink.style.background = "#222"; adminLink.style.color = "#ffb347"; adminLink.style.padding = "6px 15px";
-        adminLink.style.borderRadius = "40px"; adminLink.style.textDecoration = "none"; adminLink.style.fontWeight = "bold";
-        adminLink.innerHTML = '<i class="fas fa-user-shield"></i> ' + (currentLang === 'ar' ? 'إدارة' : 'Admin');
-        header.appendChild(adminLink);
-    }
-    initFrontend();
+    // إخفاء splash screen بعد 1.5 ثانية
+    setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if(splash) splash.classList.add('hide-splash');
+        setTimeout(() => { if(splash) splash.remove(); }, 500);
+    }, 1500);
 </script>
 </body>
-    </html>
+</html>
