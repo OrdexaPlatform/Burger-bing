@@ -2,165 +2,282 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>لوحة تحكم بيرجر بينق - Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin:0; padding:0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background: #f1f5f9; transition: 0.3s; }
-        body.dark { background: #121212; color: #eee; }
-        .login-container {
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            background: linear-gradient(135deg, #111, #ff6b00);
+        body {
+            background: #f1f5f9;
+            transition: 0.2s;
+        }
+        body.dark { background: #0f172a; color: #e2e8f0; }
+        /* Login */
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #111, #ff6b00);
         }
         .login-card {
-            background: rgba(255,255,255,0.15); backdrop-filter: blur(12px);
-            padding: 2rem; border-radius: 32px; width: 350px; color: white;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(16px);
+            padding: 2rem;
+            border-radius: 32px;
+            width: 320px;
+            text-align: center;
+            color: white;
         }
         .login-card input {
-            width: 100%; padding: 12px; margin: 10px 0; border-radius: 40px; border: none;
+            width: 100%;
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 60px;
+            border: none;
         }
-        .dashboard { display: none; padding: 20px; }
+        /* Dashboard */
+        .dashboard { display: none; padding: 16px; }
         .dashboard.active { display: block; }
-        .navbar-admin { display: flex; justify-content: space-between; background: #1e293b; padding: 15px 30px; border-radius: 40px; margin-bottom: 25px; color: white; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 28px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; }
-        body.dark .stat-card { background: #1e293b; color: white; }
-        .section { background: white; border-radius: 28px; padding: 20px; margin-bottom: 30px; }
-        body.dark .section { background: #1e293b; }
-        button, .btn {
-            background: #ff6b00; border: none; padding: 8px 16px; border-radius: 40px;
-            color: white; font-weight: bold; cursor: pointer; transition: 0.2s;
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 32px;
+            color: white;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        button:hover { transform: scale(0.97); background: #e55a00; }
-        input, select, textarea { padding: 8px 12px; border-radius: 40px; border: 1px solid #ccc; margin: 5px 0; width: 100%; }
-        .product-item, .order-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding: 12px; flex-wrap: wrap; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: right; }
-        @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
-        .toggle-dark { background: #334155; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        body.dark .stat-card {
+            background: #1e293b;
+            color: white;
+        }
+        .section-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        body.dark .section-card {
+            background: #1e293b;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #ff6b00;
+            color: white;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border-radius: 28px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: #ff6b00;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { opacity: 0.9; transform: scale(0.97); }
+        .product-row, .order-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+        }
+        @media (max-width: 640px) {
+            .admin-header { flex-direction: column; gap: 10px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<div class="login-container" id="loginContainer">
+<div class="login-wrapper" id="loginWrapper">
     <div class="login-card">
         <h2>🔐 دخول الأدمن</h2>
-        <input type="text" id="adminUsername" placeholder="اسم المستخدم">
-        <input type="password" id="adminPassword" placeholder="كلمة المرور">
-        <button id="loginBtn">دخول</button>
+        <input type="text" id="adminUser" placeholder="اسم المستخدم">
+        <input type="password" id="adminPass" placeholder="كلمة المرور">
+        <button id="doLogin">دخول</button>
     </div>
 </div>
 
-<div class="dashboard" id="dashboardContainer">
-    <div class="navbar-admin">
-        <h2>🍔 لوحة تحكم بيرجر بينق</h2>
+<div class="dashboard" id="dashboard">
+    <div class="admin-header">
+        <h2><i class="fas fa-utensils"></i> لوحة تحكم بيرجر بينق</h2>
         <div>
-            <button class="toggle-dark" id="darkModeToggle">🌙 الوضع المظلم</button>
-            <button id="logoutBtn">تسجيل خروج</button>
+            <button id="darkToggle" style="background:#334155;">🌙 الوضع المظلم</button>
+            <button id="logoutBtn" style="background:#64748b;">تسجيل خروج</button>
         </div>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-grid">
-        <div class="stat-card"><i class="fas fa-shopping-cart"></i><h3>الطلبات</h3><span id="ordersCount">0</span></div>
-        <div class="stat-card"><i class="fas fa-dollar-sign"></i><h3>إجمالي المبيعات</h3><span id="totalSales">0</span> ج.م</div>
-        <div class="stat-card"><i class="fas fa-users"></i><h3>العملاء</h3><span id="customersCount">0</span></div>
-        <div class="stat-card"><i class="fas fa-fire"></i><h3>الأكثر مبيعاً</h3><span id="topProduct">-</span></div>
-    </div>
+    <div class="stats-grid" id="statsContainer"></div>
 
-    <!-- Tabs -->
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-        <button class="tab-btn active" data-tab="products">📦 إدارة المنتجات</button>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="products">📦 المنتجات</button>
         <button class="tab-btn" data-tab="orders">📋 الطلبات</button>
         <button class="tab-btn" data-tab="sections">🏷️ الأقسام</button>
-        <button class="tab-btn" data-tab="shipping">🚚 الشحن والمحافظات</button>
+        <button class="tab-btn" data-tab="shipping">🚚 الشحن</button>
+        <button class="tab-btn" data-tab="telegram">🤖 تليجرام بوت</button>
         <button class="tab-btn" data-tab="settings">⚙️ الإعدادات</button>
-        <button class="tab-btn" data-tab="backup">💾 نسخة احتياطية</button>
+        <button class="tab-btn" data-tab="backup">💾 نسخ احتياطي</button>
     </div>
 
-    <!-- Products Tab -->
-    <div id="productsTab" class="section tab-content active">
-        <h3>➕ إضافة منتج جديد</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 10px;">
-            <input type="text" id="prodName" placeholder="اسم المنتج">
-            <input type="text" id="prodDesc" placeholder="وصف">
-            <input type="number" id="prodPrice" placeholder="سعر">
-            <select id="prodSection"></select>
-            <input type="file" id="prodImage" accept="image/*">
-            <button id="addProductBtn">إضافة</button>
+    <!-- تبويب المنتجات -->
+    <div id="productsTab" class="tab-content active">
+        <div class="section-card">
+            <h3>➕ إضافة منتج جديد</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 10px;">
+                <input type="text" id="prodName" placeholder="اسم المنتج">
+                <input type="text" id="prodDesc" placeholder="وصف">
+                <input type="number" id="prodPrice" placeholder="السعر">
+                <select id="prodSection"></select>
+                <input type="file" id="prodImage" accept="image/*">
+                <button id="addProductBtn">إضافة المنتج</button>
+            </div>
         </div>
-        <h3>📋 قائمة المنتجات</h3>
-        <div id="productsList"></div>
+        <div class="section-card">
+            <h3>📋 قائمة المنتجات</h3>
+            <div id="productsList"></div>
+        </div>
     </div>
 
-    <!-- Orders Tab -->
-    <div id="ordersTab" class="section tab-content">
-        <h3>جميع الطلبات</h3>
-        <div id="ordersList"></div>
-        <button id="deleteAllOrdersBtn" style="background:red;">🗑️ حذف جميع الطلبات</button>
+    <!-- تبويب الطلبات -->
+    <div id="ordersTab" class="tab-content">
+        <div class="section-card">
+            <h3>جميع الطلبات</h3>
+            <div id="ordersList"></div>
+            <button id="deleteAllOrdersBtn" style="background:#b91c1c;">🗑️ حذف جميع الطلبات</button>
+        </div>
     </div>
 
-    <!-- Sections Tab -->
-    <div id="sectionsTab" class="section tab-content">
-        <h3>إدارة الأقسام</h3>
-        <div style="display: flex; gap:10px;"><input type="text" id="newSectionName" placeholder="اسم قسم جديد"><button id="addSectionBtn">إضافة قسم</button></div>
-        <div id="sectionsList"></div>
+    <!-- تبويب الأقسام -->
+    <div id="sectionsTab" class="tab-content">
+        <div class="section-card">
+            <h3>إدارة الأقسام</h3>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="newSection" placeholder="اسم قسم جديد">
+                <button id="addSectionBtn">إضافة قسم</button>
+            </div>
+            <div id="sectionsList" style="margin-top: 16px;"></div>
+        </div>
     </div>
 
-    <!-- Shipping Tab -->
-    <div id="shippingTab" class="section tab-content">
-        <h3>المحافظات والمدن وأسعار الشحن</h3>
-        <div id="shippingEditor"></div>
-        <button id="saveShippingBtn">حفظ التغييرات</button>
+    <!-- تبويب الشحن -->
+    <div id="shippingTab" class="tab-content">
+        <div class="section-card">
+            <h3>إعدادات المحافظات والمدن</h3>
+            <div id="shippingEditor"></div>
+            <button id="saveShippingBtn" style="margin-top: 16px;">💾 حفظ التغييرات</button>
+        </div>
     </div>
 
-    <!-- Settings Tab -->
-    <div id="settingsTab" class="section tab-content">
-        <h3>إعدادات الموقع</h3>
-        <label>اسم المطعم:</label><input type="text" id="storeNameInput">
-        <label>الضريبة (%):</label><input type="number" id="taxRateInput">
-        <label>شعار الموقع:</label><input type="file" id="logoUpload">
-        <button id="saveSettingsBtn">حفظ</button>
-        <h3>تغيير بيانات الدخول</h3>
-        <input type="text" id="newAdminUser" placeholder="اسم مستخدم جديد">
-        <input type="password" id="newAdminPass" placeholder="كلمة مرور جديدة">
-        <button id="updateCredentialsBtn">تحديث</button>
+    <!-- تبويب التليجرام بوت -->
+    <div id="telegramTab" class="tab-content">
+        <div class="section-card">
+            <h3>🤖 تفعيل إرسال الطلبات إلى تليجرام</h3>
+            <p>أدخل Token البوت و Chat ID الخاص بك، سيتم إرسال كل طلب جديد تلقائياً.</p>
+            <input type="text" id="botToken" placeholder="Bot Token (مثل: 123456:ABC-DEF)">
+            <input type="text" id="chatId" placeholder="Chat ID (رقم)">
+            <button id="saveTelegramBtn">حفظ الإعدادات</button>
+            <button id="testTelegramBtn">📨 إرسال رسالة تجريبية</button>
+            <div id="tgStatus" style="margin-top: 12px; color: green;"></div>
+        </div>
     </div>
 
-    <!-- Backup Tab -->
-    <div id="backupTab" class="section tab-content">
-        <h3>نسخة احتياطية واستعادة</h3>
-        <button id="exportExcelBtn">📊 تصدير Excel (الطلبات)</button>
-        <button id="exportPdfBtn">📄 تصدير PDF (الطلبات)</button>
-        <button id="backupDataBtn">💾 نسخ جميع البيانات</button>
-        <input type="file" id="restoreFileInput" accept=".json">
-        <button id="restoreDataBtn">🔄 استعادة من نسخة</button>
+    <!-- تبويب الإعدادات العامة -->
+    <div id="settingsTab" class="tab-content">
+        <div class="section-card">
+            <h3>إعدادات المطعم</h3>
+            <label>اسم المطعم:</label><input type="text" id="storeName">
+            <label>نسبة الضريبة (%):</label><input type="number" id="taxRate" step="0.5">
+            <button id="saveSettingsBtn">حفظ الإعدادات</button>
+            <hr style="margin: 20px 0;">
+            <h3>تغيير بيانات دخول الأدمن</h3>
+            <input type="text" id="newAdminUsername" placeholder="اسم مستخدم جديد">
+            <input type="password" id="newAdminPassword" placeholder="كلمة مرور جديدة">
+            <button id="updateAdminCredBtn">تحديث بيانات الدخول</button>
+        </div>
+    </div>
+
+    <!-- تبويب النسخ الاحتياطي -->
+    <div id="backupTab" class="tab-content">
+        <div class="section-card">
+            <h3>نسخة احتياطية واستعادة</h3>
+            <button id="exportExcelBtn">📊 تصدير Excel (الطلبات)</button>
+            <button id="exportPdfBtn">📄 تصدير PDF (الطلبات)</button>
+            <button id="backupFullBtn">💾 تحميل نسخة كاملة (JSON)</button>
+            <input type="file" id="restoreFile" accept=".json">
+            <button id="restoreBtn">🔄 استعادة من نسخة</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Data models
-    let products = [], sections = [], orders = [], shippingData = {}, settings = {}, adminCred = { username: "admin", password: "200300" };
-    let currentTab = "products";
+    // بيانات التطبيق
+    let products = [], sections = [], orders = [], shippingData = {}, settings = {};
+    let adminCred = { username: "admin", password: "200300" };
 
     function loadAll() {
         products = JSON.parse(localStorage.getItem('bb_products') || '[]');
         sections = JSON.parse(localStorage.getItem('bb_sections') || '["البرجر","الساندوتشات","الوجبات","البطاطس","المقبلات","المشروبات","الصوصات","الحلويات"]');
         orders = JSON.parse(localStorage.getItem('bb_orders') || '[]');
-        shippingData = JSON.parse(localStorage.getItem('bb_shipping') || `{"governorates":[{"id":"gov1","name":"القاهرة","cities":[{"id":"cit1","name":"مدينة نصر","shippingCost":30},{"id":"cit2","name":"مصر الجديدة","shippingCost":35}]},{"id":"gov2","name":"الإسكندرية","cities":[{"id":"cit3","name":"وسط","shippingCost":45}]}]}`);
-        settings = JSON.parse(localStorage.getItem('bb_settings') || '{"storeName":"Burger Bing","taxRate":14}');
-        let cred = localStorage.getItem('bb_admin_cred');
-        if(cred) adminCred = JSON.parse(cred);
+        shippingData = JSON.parse(localStorage.getItem('bb_shipping') || `{"governorates":[{"id":"gov1","name":"القاهرة","cities":[{"id":"cit1","name":"مدينة نصر","shippingCost":30}]}]}`);
+        settings = JSON.parse(localStorage.getItem('bb_settings') || '{"storeName":"بيرجر بينق","taxRate":14}');
+        let savedCred = localStorage.getItem('bb_admin_cred');
+        if(savedCred) adminCred = JSON.parse(savedCred);
         updateStats();
         renderProducts();
         renderOrders();
         renderSections();
         renderShippingEditor();
         populateSectionSelect();
-        document.getElementById('storeNameInput').value = settings.storeName;
-        document.getElementById('taxRateInput').value = settings.taxRate;
+        document.getElementById('storeName').value = settings.storeName || "بيرجر بينق";
+        document.getElementById('taxRate').value = settings.taxRate || 14;
+        // تحميل إعدادات التليجرام
+        let token = localStorage.getItem('bb_bot_token') || '';
+        let chat = localStorage.getItem('bb_chat_id') || '';
+        document.getElementById('botToken').value = token;
+        document.getElementById('chatId').value = chat;
     }
 
     function saveAll() {
@@ -174,116 +291,177 @@
     }
 
     function updateStats() {
-        document.getElementById('ordersCount').innerText = orders.length;
-        let total = orders.reduce((sum,o)=>sum+o.total,0);
-        document.getElementById('totalSales').innerText = total.toFixed(2);
-        let customers = [...new Set(orders.map(o=>o.customer?.phone))].length;
-        document.getElementById('customersCount').innerText = customers;
+        let totalOrders = orders.length;
+        let totalSales = orders.reduce((sum,o)=>sum+o.total,0).toFixed(2);
+        let customers = new Set(orders.map(o=>o.customer?.phone)).size;
         let salesMap = {};
         orders.forEach(o=>o.items.forEach(it=>{ salesMap[it.name] = (salesMap[it.name]||0)+it.quantity; }));
-        let top = Object.entries(salesMap).sort((a,b)=>b[1]-a[1])[0];
-        document.getElementById('topProduct').innerText = top ? `${top[0]} (${top[1]})` : "لا توجد مبيعات";
+        let topProduct = Object.entries(salesMap).sort((a,b)=>b[1]-a[1])[0];
+        document.getElementById('statsContainer').innerHTML = `
+            <div class="stat-card"><i class="fas fa-shopping-cart"></i><h3>الطلبات</h3><span>${totalOrders}</span></div>
+            <div class="stat-card"><i class="fas fa-dollar-sign"></i><h3>المبيعات</h3><span>${totalSales} ج.م</span></div>
+            <div class="stat-card"><i class="fas fa-users"></i><h3>العملاء</h3><span>${customers}</span></div>
+            <div class="stat-card"><i class="fas fa-chart-line"></i><h3>الأكثر مبيعاً</h3><span>${topProduct ? topProduct[0] : '-'}</span></div>
+        `;
     }
 
     function renderProducts() {
-        let html = `<table><tr><th>صورة</th><th>اسم</th><th>سعر</th><th>قسم</th><th>إجراءات</th></tr>`;
+        let html = `<div style="overflow-x:auto;"><table style="width:100%;"><thead><tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>القسم</th><th>تعديل السعر</th><th>حذف</th></tr></thead><tbody>`;
         products.forEach(p => {
-            html += `<tr><td><img src="${p.image}" width="50" style="border-radius:12px;"></td><td>${p.name}</td><td><input type="number" id="price-${p.id}" value="${p.price}" style="width:80px;"></td><td>${p.section}</td><td><button onclick="updateProductPrice('${p.id}')">تحديث السعر</button> <button onclick="deleteProduct('${p.id}')" style="background:red;">حذف</button></td></tr>`;
+            html += `<tr>
+                        <td><img src="${p.image}" width="45" style="border-radius:12px;"></td>
+                        <td>${p.name}</td>
+                        <td><input type="number" id="price-${p.id}" value="${p.price}" style="width:80px;"></td>
+                        <td>${p.section}</td>
+                        <td><button onclick="updatePrice('${p.id}')">تحديث</button></td>
+                        <td><button onclick="deleteProduct('${p.id}')" style="background:#b91c1c;">حذف</button></td>
+                    </tr>`;
         });
-        html += `</table>`;
+        html += `</tbody></table></div>`;
         document.getElementById('productsList').innerHTML = html;
     }
-
-    window.updateProductPrice = (id) => {
+    window.updatePrice = (id) => {
         let newPrice = parseFloat(document.getElementById(`price-${id}`).value);
         let prod = products.find(p=>p.id===id);
-        if(prod) { prod.price = newPrice; saveAll(); renderProducts(); showToast("تم تحديث السعر"); }
+        if(prod) { prod.price = newPrice; saveAll(); renderProducts(); showMsg("تم تحديث السعر"); }
     };
-    window.deleteProduct = (id) => { products = products.filter(p=>p.id!==id); saveAll(); renderProducts(); };
-
+    window.deleteProduct = (id) => { products = products.filter(p=>p.id!==id); saveAll(); renderProducts(); showMsg("تم حذف المنتج"); };
     function renderOrders() {
-        let html = `<table><tr><th>رقم الطلب</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>الإجراء</th></tr>`;
-        orders.forEach((o,idx) => {
-            html += `<tr><td>${o.id}</td><td>${o.customer?.name}</td><td>${o.total} ج.م</td><td><select id="status-${idx}" onchange="changeOrderStatus('${o.id}', this.value)"><option ${o.status==='جديد'?'selected':''}>جديد</option><option ${o.status==='جاري التحضير'?'selected':''}>جاري التحضير</option><option ${o.status==='خرج للتوصيل'?'selected':''}>خرج للتوصيل</option><option ${o.status==='تم التسليم'?'selected':''}>تم التسليم</option></select></td><td><button onclick="viewOrderDetails('${o.id}')">تفاصيل</button></td></tr>`;
+        let html = `<div style="overflow-x:auto;"><table style="width:100%;"><thead><tr><th>رقم الطلب</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>تفاصيل</th></tr></thead><tbody>`;
+        orders.forEach(o => {
+            html += `<tr>
+                        <td>${o.id}</td>
+                        <td>${o.customer?.name || ""}</td>
+                        <td>${o.total} ج.م</td>
+                        <td><select onchange="changeStatus('${o.id}', this.value)">${["جديد","جاري التحضير","خرج للتوصيل","تم التسليم"].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
+                        <td><button onclick="alert(JSON.stringify(${JSON.stringify(o).replace(/"/g, '&quot;')}, null, 2))">عرض</button></td>
+                    </tr>`;
         });
-        html += `</table>`;
+        html += `</tbody></table></div>`;
         document.getElementById('ordersList').innerHTML = html;
     }
-    window.changeOrderStatus = (orderId, newStatus) => {
-        let order = orders.find(o=>o.id===orderId);
+    window.changeStatus = (id, newStatus) => {
+        let order = orders.find(o=>o.id===id);
         if(order) order.status = newStatus;
         saveAll();
         renderOrders();
-        showToast("تم تحديث الحالة");
+        showMsg("تم تحديث حالة الطلب");
     };
-    window.viewOrderDetails = (id) => { alert(JSON.stringify(orders.find(o=>o.id===id),null,2)); };
-    document.getElementById('deleteAllOrdersBtn').onclick = () => { if(confirm("حذف كل الطلبات نهائياً؟")){ orders=[]; saveAll(); renderOrders(); } };
-
     function renderSections() {
-        let html = `<ul>`;
-        sections.forEach((sec,idx) => { html += `<li style="margin:8px;">${sec} <button onclick="editSection(${idx})">تعديل</button> <button onclick="deleteSection(${idx})" style="background:red;">حذف</button></li>`; });
-        html+=`</ul>`;
+        let html = `<ul style="list-style: none;">`;
+        sections.forEach((s, idx) => {
+            html += `<li style="margin: 8px 0; display: flex; gap: 10px; align-items: center;">${s} <button onclick="editSection(${idx})">تعديل</button> <button onclick="deleteSection(${idx})" style="background:#b91c1c;">حذف</button></li>`;
+        });
+        html += `</ul>`;
         document.getElementById('sectionsList').innerHTML = html;
     }
-    window.editSection = (idx) => { let newName = prompt("اسم جديد", sections[idx]); if(newName) { sections[idx]=newName; saveAll(); renderSections(); populateSectionSelect(); }}; 
+    window.editSection = (idx) => { let newName = prompt("الاسم الجديد", sections[idx]); if(newName) { sections[idx]=newName; saveAll(); renderSections(); populateSectionSelect(); } };
     window.deleteSection = (idx) => { sections.splice(idx,1); saveAll(); renderSections(); populateSectionSelect(); };
-    document.getElementById('addSectionBtn').onclick = () => { let newName=document.getElementById('newSectionName').value; if(newName){ sections.push(newName); saveAll(); renderSections(); populateSectionSelect(); document.getElementById('newSectionName').value=''; }};
-
     function populateSectionSelect() {
         let select = document.getElementById('prodSection');
         if(select) select.innerHTML = sections.map(s=>`<option>${s}</option>`).join('');
     }
-    document.getElementById('addProductBtn').onclick = () => {
-        let name = document.getElementById('prodName').value, desc=document.getElementById('prodDesc').value, price=parseFloat(document.getElementById('prodPrice').value), sec=document.getElementById('prodSection').value, file=document.getElementById('prodImage').files[0];
-        if(!name || !price) return showToast("الاسم والسعر مطلوبان");
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            let newId = 'p'+Date.now()+Math.random();
-            products.push({ id:newId, name, desc, price, section:sec, image: e.target.result || "https://via.placeholder.com/200", rating:4, offerBadge:false, salesCount:0 });
-            saveAll(); renderProducts(); showToast("تمت الإضافة");
-            document.getElementById('prodName').value=''; document.getElementById('prodDesc').value=''; document.getElementById('prodPrice').value='';
-        };
-        if(file) reader.readAsDataURL(file);
-        else reader.onload({ target:{ result:"https://via.placeholder.com/200"} });
-    };
-
     function renderShippingEditor() {
         let html = ``;
         shippingData.governorates.forEach((gov, gidx) => {
-            html += `<div style="border:1px solid #ccc; padding:12px; margin-bottom:12px;"><input value="${gov.name}" id="govName-${gidx}" placeholder="اسم المحافظة"><button onclick="updateGovName(${gidx})">حفظ</button><button onclick="removeGov(${gidx})" style="background:red;">حذف</button><h4>المدن:</h4>`;
+            html += `<div style="border:1px solid #ccc; border-radius: 20px; padding: 12px; margin-bottom: 16px;">
+                        <input value="${gov.name}" id="govName-${gidx}" placeholder="اسم المحافظة">
+                        <button onclick="updateGovName(${gidx})">حفظ المحافظة</button>
+                        <button onclick="removeGov(${gidx})" style="background:#b91c1c;">حذف</button>
+                        <h4>المدن:</h4>`;
             gov.cities.forEach((city, cidx) => {
-                html += `<div style="display:flex; gap:8px;"><input value="${city.name}" id="cityName-${gidx}-${cidx}"><input type="number" value="${city.shippingCost}" id="cityCost-${gidx}-${cidx}" placeholder="سعر الشحن"><button onclick="updateCity(${gidx},${cidx})">تحديث</button><button onclick="removeCity(${gidx},${cidx})">حذف</button></div>`;
+                html += `<div style="display: flex; gap: 8px; margin: 6px 0;">
+                            <input value="${city.name}" id="cityName-${gidx}-${cidx}" placeholder="اسم المدينة">
+                            <input type="number" value="${city.shippingCost}" id="cityCost-${gidx}-${cidx}" placeholder="سعر الشحن" style="width:100px;">
+                            <button onclick="updateCity(${gidx},${cidx})">تحديث</button>
+                            <button onclick="removeCity(${gidx},${cidx})">حذف</button>
+                         </div>`;
             });
             html += `<button onclick="addCity(${gidx})">+ إضافة مدينة</button><hr></div>`;
         });
-        html += `<button id="addGovBtn">+ إضافة محافظة</button>`;
+        html += `<button id="addGovBtn">+ إضافة محافظة جديدة</button>`;
         document.getElementById('shippingEditor').innerHTML = html;
         document.getElementById('addGovBtn').onclick = () => { shippingData.governorates.push({ id:"gov"+Date.now(), name:"محافظة جديدة", cities:[] }); renderShippingEditor(); };
     }
-    window.updateGovName = (idx) => { let newName = document.getElementById(`govName-${idx}`).value; if(newName) shippingData.governorates[idx].name = newName; renderShippingEditor(); };
+    window.updateGovName = (idx) => { let val = document.getElementById(`govName-${idx}`).value; if(val) shippingData.governorates[idx].name = val; renderShippingEditor(); };
     window.removeGov = (idx) => { shippingData.governorates.splice(idx,1); renderShippingEditor(); };
     window.updateCity = (gidx, cidx) => { let newName = document.getElementById(`cityName-${gidx}-${cidx}`).value; let newCost = parseFloat(document.getElementById(`cityCost-${gidx}-${cidx}`).value); if(newName) shippingData.governorates[gidx].cities[cidx].name = newName; if(!isNaN(newCost)) shippingData.governorates[gidx].cities[cidx].shippingCost = newCost; renderShippingEditor(); };
-    window.removeCity = (gidx,cidx) => { shippingData.governorates[gidx].cities.splice(cidx,1); renderShippingEditor(); };
+    window.removeCity = (gidx, cidx) => { shippingData.governorates[gidx].cities.splice(cidx,1); renderShippingEditor(); };
     window.addCity = (gidx) => { shippingData.governorates[gidx].cities.push({ id:"c"+Date.now(), name:"مدينة جديدة", shippingCost:20 }); renderShippingEditor(); };
-    document.getElementById('saveShippingBtn').onclick = () => { saveAll(); showToast("تم حفظ الشحن"); };
+    document.getElementById('saveShippingBtn').onclick = () => { saveAll(); showMsg("تم حفظ بيانات الشحن"); };
 
-    document.getElementById('saveSettingsBtn').onclick = () => { settings.storeName = document.getElementById('storeNameInput').value; settings.taxRate = parseFloat(document.getElementById('taxRateInput').value); saveAll(); showToast("تم حفظ الإعدادات"); };
-    document.getElementById('updateCredentialsBtn').onclick = () => { let u=document.getElementById('newAdminUser').value, p=document.getElementById('newAdminPass').value; if(u && p){ adminCred.username=u; adminCred.password=p; saveAll(); showToast("تم تحديث بيانات الدخول"); }};
+    // Telegram
+    document.getElementById('saveTelegramBtn').onclick = () => {
+        let token = document.getElementById('botToken').value.trim();
+        let chat = document.getElementById('chatId').value.trim();
+        if(token && chat) {
+            localStorage.setItem('bb_bot_token', token);
+            localStorage.setItem('bb_chat_id', chat);
+            showMsg("تم حفظ إعدادات التليجرام");
+        } else { showMsg("يرجى إدخال Token و Chat ID"); }
+    };
+    document.getElementById('testTelegramBtn').onclick = async () => {
+        let token = localStorage.getItem('bb_bot_token');
+        let chat = localStorage.getItem('bb_chat_id');
+        if(!token || !chat) { showMsg("لم يتم إعداد البوت بعد"); return; }
+        let msg = "🔔 رسالة تجريبية من لوحة تحكم بيرجر بينق. البوت يعمل بنجاح ✅";
+        try {
+            let res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ chat_id: chat, text: msg })
+            });
+            if(res.ok) showMsg("تم إرسال الرسالة التجريبية بنجاح");
+            else showMsg("فشل الإرسال، تحقق من التوكن والـ Chat ID");
+        } catch(e) { showMsg("خطأ في الاتصال"); }
+    };
 
-    // Export & Backup
-    document.getElementById('exportExcelBtn').onclick = () => { let csv = "Order ID,Customer,Total,Status\n"+orders.map(o=>`${o.id},${o.customer.name},${o.total},${o.status}`).join("\n"); let blob=new Blob([csv],{type:"text/csv"}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="orders.csv"; a.click(); };
+    document.getElementById('saveSettingsBtn').onclick = () => {
+        settings.storeName = document.getElementById('storeName').value;
+        settings.taxRate = parseFloat(document.getElementById('taxRate').value);
+        saveAll();
+        showMsg("تم حفظ الإعدادات");
+    };
+    document.getElementById('updateAdminCredBtn').onclick = () => {
+        let newUser = document.getElementById('newAdminUsername').value;
+        let newPass = document.getElementById('newAdminPassword').value;
+        if(newUser && newPass) { adminCred.username = newUser; adminCred.password = newPass; saveAll(); showMsg("تم تحديث بيانات الدخول"); }
+        else showMsg("املأ الحقول");
+    };
+    document.getElementById('addProductBtn').onclick = () => {
+        let name = document.getElementById('prodName').value, desc=document.getElementById('prodDesc').value, price=parseFloat(document.getElementById('prodPrice').value), sec=document.getElementById('prodSection').value, file=document.getElementById('prodImage').files[0];
+        if(!name || !price) { showMsg("الاسم والسعر مطلوبان"); return; }
+        let reader = new FileReader();
+        reader.onload = (e) => {
+            let newId = "p"+Date.now()+Math.random();
+            products.push({ id:newId, name, desc, price, section:sec, image: e.target.result || "https://via.placeholder.com/200", rating:4, offerBadge:false, salesCount:0 });
+            saveAll(); renderProducts(); showMsg("تمت الإضافة");
+            document.getElementById('prodName').value=''; document.getElementById('prodDesc').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodImage').value='';
+        };
+        if(file) reader.readAsDataURL(file);
+        else reader.onload({ target:{ result:"https://via.placeholder.com/200" } })();
+    };
+    document.getElementById('addSectionBtn').onclick = () => { let ns = document.getElementById('newSection').value; if(ns) { sections.push(ns); saveAll(); renderSections(); populateSectionSelect(); document.getElementById('newSection').value=''; showMsg("تمت الإضافة"); } };
+    document.getElementById('deleteAllOrdersBtn').onclick = () => { if(confirm("حذف جميع الطلبات نهائياً؟")) { orders = []; saveAll(); renderOrders(); showMsg("تم حذف الطلبات"); } };
+    // Export / Backup
+    document.getElementById('exportExcelBtn').onclick = () => { let csv = "ID,Customer,Total,Status\n"+orders.map(o=>`${o.id},${o.customer.name},${o.total},${o.status}`).join("\n"); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download="orders.csv"; a.click(); };
     document.getElementById('exportPdfBtn').onclick = () => { window.print(); };
-    document.getElementById('backupDataBtn').onclick = () => { let data={products, sections, orders, shippingData, settings, adminCred}; let blob=new Blob([JSON.stringify(data)],{type:"application/json"}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="burgerbing_backup.json"; a.click(); };
-    document.getElementById('restoreDataBtn').onclick = () => { let file=document.getElementById('restoreFileInput').files[0]; if(!file) return; let reader=new FileReader(); reader.onload=e=>{ let backup=JSON.parse(e.target.result); if(backup.products) products=backup.products; if(backup.sections) sections=backup.sections; if(backup.orders) orders=backup.orders; if(backup.shippingData) shippingData=backup.shippingData; if(backup.settings) settings=backup.settings; saveAll(); location.reload(); }; reader.readAsText(file); };
-
+    document.getElementById('backupFullBtn').onclick = () => { let data = { products, sections, orders, shippingData, settings, adminCred }; let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)])); a.download="burger_backup.json"; a.click(); };
+    document.getElementById('restoreBtn').onclick = () => { let file = document.getElementById('restoreFile').files[0]; if(!file) return; let reader = new FileReader(); reader.onload = e => { let backup = JSON.parse(e.target.result); if(backup.products) products = backup.products; if(backup.sections) sections = backup.sections; if(backup.orders) orders = backup.orders; if(backup.shippingData) shippingData = backup.shippingData; if(backup.settings) settings = backup.settings; if(backup.adminCred) adminCred = backup.adminCred; saveAll(); location.reload(); }; reader.readAsText(file); };
     // Auth
-    document.getElementById('loginBtn').onclick = () => { let u=document.getElementById('adminUsername').value, p=document.getElementById('adminPassword').value; if(u===adminCred.username && p===adminCred.password){ document.getElementById('loginContainer').style.display='none'; document.getElementById('dashboardContainer').classList.add('active'); loadAll(); } else alert("بيانات دخول خاطئة"); };
-    document.getElementById('logoutBtn').onclick = () => { document.getElementById('loginContainer').style.display='flex'; document.getElementById('dashboardContainer').classList.remove('active'); };
-    // Dark mode
-    document.getElementById('darkModeToggle').onclick = () => { document.body.classList.toggle('dark'); };
+    document.getElementById('doLogin').onclick = () => { let u=document.getElementById('adminUser').value, p=document.getElementById('adminPass').value; if(u===adminCred.username && p===adminCred.password) { document.getElementById('loginWrapper').style.display='none'; document.getElementById('dashboard').classList.add('active'); loadAll(); } else alert("بيانات دخول غير صحيحة"); };
+    document.getElementById('logoutBtn').onclick = () => { document.getElementById('loginWrapper').style.display='flex'; document.getElementById('dashboard').classList.remove('active'); };
+    document.getElementById('darkToggle').onclick = () => { document.body.classList.toggle('dark'); };
     // Tabs
-    document.querySelectorAll('.tab-btn').forEach(btn=>{ btn.onclick=()=>{ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(btn.dataset.tab+'Tab').classList.add('active'); }; });
-    function showToast(msg){ let t=document.createElement('div'); t.innerText=msg; t.style.position='fixed'; t.style.bottom='20px'; t.style.right='20px'; t.style.background='#ff6b00'; t.style.color='white'; t.style.padding='12px'; t.style.borderRadius='40px'; document.body.appendChild(t); setTimeout(()=>t.remove(),2000); }
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+            document.getElementById(btn.dataset.tab+'Tab').classList.add('active');
+        };
+    });
+    function showMsg(m) { let d=document.createElement('div'); d.innerText=m; d.style.position='fixed'; d.style.bottom='20px'; d.style.right='20px'; d.style.background='#ff6b00'; d.style.color='white'; d.style.padding='8px 16px'; d.style.borderRadius='40px'; d.style.zIndex='9999'; document.body.appendChild(d); setTimeout(()=>d.remove(),2500); }
 </script>
 </body>
     </html>
