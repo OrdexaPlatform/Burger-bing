@@ -6,18 +6,17 @@
     <title>بيرجر بينق | ألذ برجر</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDK (الإصدار المتوافق) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        :root { --primary: #FF6B00; --primary-dark: #E55A00; --light-bg: #f8f9fc; }
+        :root { --primary: #FF6B00; --light-bg: #f8f9fc; }
         body { background: var(--light-bg); padding-bottom: 70px; }
         .navbar { position: sticky; top:0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; color: white; }
         .navbar .logo { display: flex; align-items: center; gap: 10px; }
         .logo h1 { font-size: 1.4rem; color: var(--primary); }
-        .logo img { max-height: 45px; }
-        .cart-icon { background: var(--primary); padding: 6px 14px; border-radius: 40px; font-weight: bold; border: none; color: white; cursor: pointer; }
+        .cart-icon { background: var(--primary); padding: 6px 14px; border-radius: 40px; border: none; color: white; cursor: pointer; }
         .slider-container { margin: 12px; border-radius: 28px; overflow: hidden; }
         .slider { display: flex; transition: 0.4s; }
         .slider img { width: 100%; min-width: 100%; height: 180px; object-fit: cover; }
@@ -41,34 +40,18 @@
         .modal { position: fixed; top:50%; left:50%; transform: translate(-50%,-50%); background: white; width: 90%; max-width: 450px; border-radius: 32px; padding: 24px; z-index: 1100; display: none; }
         .modal.active { display: block; }
         input, select, textarea { width: 100%; padding: 10px; margin: 6px 0; border-radius: 28px; border: 1px solid #ccc; }
-        button { cursor: pointer; }
         @media (min-width: 768px) { .products-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } .slider img { height: 280px; } }
     </style>
 </head>
 <body>
-
 <div class="navbar">
-    <div class="logo">
-        <img id="storeLogo" src="" style="display: none;">
-        <h1 id="storeNameHeader">🍔 بيرجر بينق</h1>
-    </div>
+    <div class="logo"><img id="storeLogo" src="" style="display: none;"><h1 id="storeNameHeader">🍔 بيرجر بينق</h1></div>
     <button id="openCartBtn" class="cart-icon"><i class="fas fa-shopping-cart"></i> السلة (<span id="cartCount">0</span>)</button>
 </div>
-
-<div class="slider-container">
-    <div class="slider" id="slider">
-        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600">
-        <img src="https://images.unsplash.com/photo-1551782450-1713b4fc2b72?w=600">
-        <img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600">
-    </div>
-</div>
-
-<div class="search-filter">
-    <input type="text" id="searchInput" placeholder="🔍 ابحث عن برجر...">
-</div>
+<div class="slider-container"><div class="slider" id="slider"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600"><img src="https://images.unsplash.com/photo-1551782450-1713b4fc2b72?w=600"><img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600"></div></div>
+<div class="search-filter"><input type="text" id="searchInput" placeholder="🔍 ابحث عن برجر..."></div>
 <div class="categories" id="categoriesContainer"></div>
 <div class="products-grid" id="productsContainer"></div>
-
 <div class="floating-cart" id="floatingCartBtn"><i class="fas fa-shopping-bag"></i></div>
 <div class="overlay" id="overlay"></div>
 <div class="cart-sidebar" id="cartSidebar">
@@ -90,7 +73,7 @@
 </div>
 
 <script>
-    // ------------------- 🔑 بيانات Firebase الخاصة بك -------------------
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyCCVHuGw8KBHvjIkrJkptgxW3ExY1GRe5I",
         authDomain: "burgerbing-607fe.firebaseapp.com",
@@ -99,7 +82,6 @@
         messagingSenderId: "867066695945",
         appId: "1:867066695945:web:f5f91cdc143eba89b343d8"
     };
-    // ----------------------------------------------------------------
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
@@ -109,18 +91,58 @@
     function showToast(msg) { let t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
     function saveCart() { localStorage.setItem('temp_cart', JSON.stringify(cart)); }
 
-    async function loadAll() {
-        try {
-            const productsSnap = await db.collection('products').get();
+    // دالة لتهيئة البيانات الافتراضية في Firebase إذا كانت فارغة
+    async function initializeDefaultData() {
+        const sectionsDoc = await db.collection('settings').doc('sections').get();
+        if (!sectionsDoc.exists) {
+            const defaultSections = ["البرجر", "الساندوتشات", "الوجبات", "البطاطس", "المقبلات", "المشروبات", "الصوصات", "الحلويات"];
+            await db.collection('settings').doc('sections').set({ list: defaultSections });
+            sections = defaultSections;
+        } else {
+            sections = sectionsDoc.data().list;
+        }
+
+        const productsSnap = await db.collection('products').get();
+        if (productsSnap.empty) {
+            const defaultProducts = [
+                { id: "p1", name: "دبل تشيز برجر", desc: "جبنة مضاعفة ولحم", price: 85, section: "البرجر", image: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=200", rating: 4.8, offerBadge: true, salesCount: 0 },
+                { id: "p2", name: "برجر كلاسيك", desc: "طماطم وخس", price: 65, section: "البرجر", image: "https://images.unsplash.com/photo-1551782450-1713b4fc2b72?w=200", rating: 4.5, offerBadge: false, salesCount: 0 },
+                { id: "p3", name: "ساندوتش فراخ", desc: "صوص مميز", price: 55, section: "الساندوتشات", image: "https://images.unsplash.com/photo-1606755962773-d324e0a1304e?w=200", rating: 4.6, offerBadge: false, salesCount: 0 },
+                { id: "p4", name: "وجبة عائلة", desc: "برجر+بطاطس+بيبسي", price: 180, section: "الوجبات", image: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=200", rating: 4.9, offerBadge: true, salesCount: 0 },
+                { id: "p5", name: "بطاطس حراقة", desc: "مقرمشة", price: 25, section: "البطاطس", image: "https://images.unsplash.com/photo-1630384060421-cf20c0e0dbb2?w=200", rating: 4.7, offerBadge: false, salesCount: 0 },
+                { id: "p6", name: "صوص ثوم", desc: "صلصة", price: 10, section: "الصوصات", image: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", rating: 4.4, offerBadge: false, salesCount: 0 },
+                { id: "p7", name: "كوكاكولا", desc: "مشروب غازي", price: 12, section: "المشروبات", image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=200", rating: 4.3, offerBadge: false, salesCount: 0 },
+                { id: "p8", name: "كنافة", desc: "حلو شرقي", price: 40, section: "الحلويات", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200", rating: 4.9, offerBadge: false, salesCount: 0 }
+            ];
+            for (let p of defaultProducts) {
+                await db.collection('products').doc(p.id).set(p);
+            }
+            products = defaultProducts;
+        } else {
             products = productsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            const sectionsDoc = await db.collection('settings').doc('sections').get();
-            sections = sectionsDoc.exists ? sectionsDoc.data().list : ["البرجر","الساندوتشات","الوجبات","البطاطس","المقبلات","المشروبات","الصوصات","الحلويات"];
-            const shippingDoc = await db.collection('settings').doc('shipping').get();
-            shippingData = shippingDoc.exists ? shippingDoc.data() : { governorates: [{ id:"gov1", name:"القاهرة", cities:[{ id:"cit1", name:"مدينة نصر", shippingCost:30 }] }] };
-            const settingsDoc = await db.collection('settings').doc('main').get();
-            if(settingsDoc.exists) settings = settingsDoc.data();
-            updateUI();
-        } catch(e) { console.error(e); showToast("خطأ في تحميل البيانات"); }
+        }
+
+        const shippingDoc = await db.collection('settings').doc('shipping').get();
+        if (!shippingDoc.exists) {
+            const defaultShipping = { governorates: [{ id: "gov1", name: "القاهرة", cities: [{ id: "cit1", name: "مدينة نصر", shippingCost: 30 }, { id: "cit2", name: "مصر الجديدة", shippingCost: 35 }] }, { id: "gov2", name: "الإسكندرية", cities: [{ id: "cit3", name: "وسط", shippingCost: 45 }] }] };
+            await db.collection('settings').doc('shipping').set(defaultShipping);
+            shippingData = defaultShipping;
+        } else {
+            shippingData = shippingDoc.data();
+        }
+
+        const settingsDoc = await db.collection('settings').doc('main').get();
+        if (!settingsDoc.exists) {
+            await db.collection('settings').doc('main').set({ storeName: "بيرجر بينق", taxRate: 14, logo: "" });
+            settings = { storeName: "بيرجر بينق", taxRate: 14, logo: "" };
+        } else {
+            settings = settingsDoc.data();
+        }
+    }
+
+    async function loadAll() {
+        await initializeDefaultData();  // هتضيف البيانات تلقائياً لو مفيش
+        updateUI();
     }
 
     function updateUI() {
@@ -130,6 +152,7 @@
     }
 
     function renderCategories(active = "الكل") {
+        if(!sections.length) return;
         let cats = `<button class="category-btn ${active==='الكل'?'active':''}" data-cat="الكل">الكل</button>`;
         sections.forEach(sec => { cats += `<button class="category-btn ${active===sec?'active':''}" data-cat="${sec}">${sec}</button>`; });
         document.getElementById('categoriesContainer').innerHTML = cats;
@@ -144,7 +167,7 @@
                 ${p.offerBadge ? '<span class="badge-offer">🔥 عرض</span>' : ''}
                 <img class="product-img" src="${p.image}" onerror="this.src='https://via.placeholder.com/200'">
                 <h3>${p.name}</h3>
-                <p>${p.desc.substring(0,40)}</p>
+                <p>${p.desc?.substring(0,40) || ''}</p>
                 <div class="price">${p.price} ج.م</div>
                 <button class="add-btn" onclick="addToCart('${p.id}')">➕ أضف</button>
             </div>`).join('');
@@ -153,6 +176,7 @@
 
     window.addToCart = (id) => {
         let product = products.find(p=>p.id===id);
+        if(!product) return;
         let existing = cart.find(i=>i.id===id);
         if(existing) existing.quantity++;
         else cart.push({id, name: product.name, price: product.price, quantity: 1, image: product.image});
@@ -169,25 +193,25 @@
     window.removeCartItem = (id) => { cart = cart.filter(i=>i.id!==id); saveCart(); updateCartCount(); renderCartSidebar(); };
     function updateCartSummary() {
         let subtotal = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
-        let tax = subtotal * (settings.taxRate / 100);
+        let tax = subtotal * ((settings.taxRate || 14) / 100);
         let shipping = getSelectedShippingCost();
         let discount = appliedCoupon ? subtotal * (appliedCoupon.discount/100) : 0;
         let total = subtotal + tax + shipping - discount;
-        document.getElementById('cartSummary').innerHTML = `<div>المجموع: ${subtotal} ج.م</div><div>الضريبة (${settings.taxRate}%): ${tax.toFixed(2)} ج.م</div><div>الشحن: ${shipping} ج.م</div><div>الخصم: -${discount.toFixed(2)} ج.م</div><hr><h3>الإجمالي: ${total.toFixed(2)} ج.م</h3>`;
+        document.getElementById('cartSummary').innerHTML = `<div>المجموع: ${subtotal} ج.م</div><div>الضريبة (${settings.taxRate||14}%): ${tax.toFixed(2)} ج.م</div><div>الشحن: ${shipping} ج.م</div><div>الخصم: -${discount.toFixed(2)} ج.م</div><hr><h3>الإجمالي: ${total.toFixed(2)} ج.م</h3>`;
     }
-    function getSelectedShippingCost() { if(!selectedGovId || !selectedCityId) return 0; let gov = shippingData.governorates.find(g=>g.id === selectedGovId); if(gov){ let city = gov.cities.find(c=>c.id === selectedCityId); return city ? city.shippingCost : 0; } return 0; }
+    function getSelectedShippingCost() { if(!selectedGovId || !selectedCityId) return 0; let gov = shippingData.governorates?.find(g=>g.id === selectedGovId); if(gov){ let city = gov.cities?.find(c=>c.id === selectedCityId); return city ? city.shippingCost : 0; } return 0; }
     function loadShippingSelects() {
         let govSelect = document.getElementById('governorateSelect');
         govSelect.innerHTML = '<option value="">اختر المحافظة</option>';
         if(shippingData.governorates) shippingData.governorates.forEach(gov => { let opt = document.createElement('option'); opt.value = gov.id; opt.innerText = gov.name; govSelect.appendChild(opt); });
-        govSelect.onchange = (e) => { selectedGovId = e.target.value; let citySelect = document.getElementById('citySelect'); citySelect.innerHTML = '<option value="">اختر المدينة</option>'; let govObj = shippingData.governorates.find(g=>g.id === selectedGovId); if(govObj) govObj.cities.forEach(city => { let opt = document.createElement('option'); opt.value = city.id; opt.innerText = `${city.name} (شحن ${city.shippingCost} ج.م)`; citySelect.appendChild(opt); }); updateCartSummary(); };
+        govSelect.onchange = (e) => { selectedGovId = e.target.value; let citySelect = document.getElementById('citySelect'); citySelect.innerHTML = '<option value="">اختر المدينة</option>'; let govObj = shippingData.governorates?.find(g=>g.id === selectedGovId); if(govObj) govObj.cities.forEach(city => { let opt = document.createElement('option'); opt.value = city.id; opt.innerText = `${city.name} (شحن ${city.shippingCost} ج.م)`; citySelect.appendChild(opt); }); updateCartSummary(); };
         document.getElementById('citySelect').onchange = (e) => { selectedCityId = e.target.value; updateCartSummary(); };
     }
     document.getElementById('applyCouponBtn').onclick = () => { let code = document.getElementById('couponCodeInput').value; let validCoupons = [{code:"WELCOME10", discount:10}]; let found = validCoupons.find(c=>c.code === code); if(found) { appliedCoupon = found; showToast(`خصم ${found.discount}% مفعل`); updateCartSummary(); } else { showToast("كود غير صالح"); appliedCoupon = null; updateCartSummary(); } };
     async function placeOrder(customer) {
         if(cart.length === 0) { showToast("السلة فارغة!"); return; }
         let subtotal = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
-        let tax = subtotal * (settings.taxRate/100);
+        let tax = subtotal * ((settings.taxRate || 14)/100);
         let shipping = getSelectedShippingCost();
         let discount = appliedCoupon ? subtotal*(appliedCoupon.discount/100) : 0;
         let total = subtotal+tax+shipping-discount;
@@ -211,9 +235,8 @@
     document.getElementById('searchInput').addEventListener('input', () => filterProducts());
     // Slider
     let slideIndex=0, slides=document.querySelectorAll('.slider img');
-    function autoSlide() { slideIndex=(slideIndex+1)%slides.length; document.querySelector('.slider').style.transform=`translateX(-${slideIndex*100}%)`; }
-    setInterval(autoSlide, 4000);
+    if(slides.length) { function autoSlide() { slideIndex=(slideIndex+1)%slides.length; document.querySelector('.slider').style.transform=`translateX(-${slideIndex*100}%)`; } setInterval(autoSlide, 4000); }
     loadAll();
 </script>
 </body>
-                                                      </html>
+    </html>
